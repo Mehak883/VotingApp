@@ -15,6 +15,7 @@ namespace VotingApp.API.Data
         public DbSet<Voter> Voters { get; set; }
         public DbSet<Candidate> Candidates { get; set; }
         public DbSet<Vote> Votes { get; set; }
+        public DbSet<AuthUser> AuthUsers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Vote>()
