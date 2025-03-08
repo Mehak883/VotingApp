@@ -14,6 +14,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("VotingAppConnect
     ));
 var app = builder.Build();
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
