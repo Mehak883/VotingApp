@@ -1,5 +1,10 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using VotingApp.API.Data;
+using VotingApp.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +17,33 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<VotingAppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("VotingAppConnectionString")
     ));
+
+builder.Services.AddIdentity<AuthUser, IdentityRole>()
+    .AddEntityFrameworkStores<VotingAppDbContext>()
+    .AddDefaultTokenProviders();
+
+
+var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"]
+    };
+});
+builder.Services.AddAuthorization();
 var app = builder.Build();
 
 
