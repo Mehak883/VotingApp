@@ -5,12 +5,16 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VotingApp.API.Data;
 using VotingApp.API.Models;
+
+using VotingApp.API.Services.Interfaces;
 using VotingApp.API.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddSingleton<ILoggerService, LoggerService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
