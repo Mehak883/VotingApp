@@ -32,18 +32,35 @@ namespace VotingApp.API.Services
         }
         public async Task<StateResponse> AddStateAsync(StateRequest stateRequest)
         {
+            bool stateExists = await _context.States.AnyAsync(s => s.Name.ToLower() == stateRequest.Name.ToLower());
+
+            if (stateExists)
+            {
+                    return null; 
+             
+            }
             var state = new State { Name = stateRequest.Name };
             _context.States.Add(state);
             await _context.SaveChangesAsync();
             return new StateResponse { Id = state.Id, Name = state.Name };
         }
 
-        public async Task<bool> UpdateStateAsync(Guid Id, StateRequest stateRequest )
+        public async Task<bool?> UpdateStateAsync(Guid Id, StateRequest stateRequest )
         {
+            bool stateExists = await _context.States.AnyAsync(s => s.Name.ToLower() == stateRequest.Name.ToLower());
+
+            if (stateExists)
+            {
+                return null; // Indicating state already exists
+
+            }
+
             var state = await _context.States.FindAsync(Id);
+            
             if (state == null) {
                 return false; 
             }
+             
             state.Name = stateRequest.Name;
             await _context.SaveChangesAsync();
             return true;

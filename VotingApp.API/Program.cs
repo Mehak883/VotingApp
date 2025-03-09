@@ -17,17 +17,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddSingleton<ILoggerService, LoggerService>();
+builder.Services.AddScoped<IPartyService, PartyService>();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<VotingAppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("VotingAppConnectionString")
     ));
 
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddSingleton<ILoggerService, LoggerService>();
+
 
 
 builder.Services.AddIdentity<AuthUser, IdentityRole>()
@@ -91,7 +91,6 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 
-builder.Services.AddScoped<IPartyService, PartyService>();
 
 
 

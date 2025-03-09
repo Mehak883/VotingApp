@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VotingApp.API.DTOs;
+using VotingApp.API.DTOs.State;
 using VotingApp.API.Models;
+using VotingApp.API.Services;
 using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
@@ -18,8 +20,13 @@ namespace VotingApp.API.Controllers
             this.partyService = partyService;
         }
 
-
-        
+        [HttpGet]
+        [Route("allParties")]
+public async Task<IActionResult> GetAllParties()
+        {
+            var result = await partyService.GetAllPartiesAsync();
+            return Ok(new { data = result});
+        }
         [HttpPost]
         public async Task<IActionResult> AddParty(PartyModel partyModel)
         {
@@ -28,12 +35,12 @@ namespace VotingApp.API.Controllers
             {
                 return Ok(new
                 {
-                    Message = "Party data added successfully",
-                    Party = result
+                    message = "Party data added successfully",
+                    data = result
                 });
             }
 
-            return BadRequest("Data adding failed");
+            return BadRequest(new { message = "Party already exists" });
         }
 
         [HttpGet("{id}")]
@@ -42,10 +49,25 @@ namespace VotingApp.API.Controllers
             var party = await partyService.GetPartyData(id);
 
             if (party != null)
-                return Ok(party);
+                return Ok(new{data=party});
 
             return NotFound("Party not found");
         }
+        [Authorize]
+        [HttpPatch]
+        public async Task<IActionResult> UpdateState(Guid Id, PartyModel partyModel)
+        {
+            bool? result = await partyService.UpdatePartyAsync(Id,partyModel );
+            if (result == null)
+            {
+                return BadRequest(new { message = "Party already exists" });
 
+            }
+            if ((bool)!result) return NotFound("Party not found");
+            return Ok(new
+            {
+                message = "Party updated successfully"
+            });
+        }
     }
 }

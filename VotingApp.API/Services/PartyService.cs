@@ -1,4 +1,5 @@
-﻿using VotingApp.API.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using VotingApp.API.Data;
 using VotingApp.API.DTOs;
 using VotingApp.API.Services.Interfaces;
 
@@ -15,6 +16,13 @@ namespace VotingApp.API.Services
 
         public async Task<PartyResponseDto?> AddPartyData(PartyModel partyModel)
         {
+
+            if (await GetPartyExists(partyModel))
+            {
+                return null;
+
+            }
+
             var party = new Models.Party
             {
                 Id= Guid.NewGuid(),
@@ -32,10 +40,19 @@ namespace VotingApp.API.Services
                 Symbol = party.Symbol
             };
         }
-
-        public async Task<PartyResponseDto?> GetPartyData(Guid id)
+        public async Task<List<PartyResponseDto>> GetAllPartiesAsync()
         {
-            var party = await dbContext.Parties.FindAsync(id);
+            return await dbContext.Parties
+               .Select(p => new PartyResponseDto { Id = p.Id, Name = p.Name,Symbol=p.Symbol })
+               .ToListAsync();
+        }
+
+
+
+        public async Task<PartyResponseDto?> GetPartyData(Guid Id)
+        {
+           
+                var party = await dbContext.Parties.FindAsync(Id);
             if (party == null) return null;
 
             return new PartyResponseDto
@@ -46,5 +63,29 @@ namespace VotingApp.API.Services
             };
         }
 
+        public async Task<bool> GetPartyExists(PartyModel partyModel)
+        {
+            return await dbContext.Parties.AnyAsync(p => p.Name.ToLower() == partyModel.Name.ToLower() || p.Symbol == partyModel.Symbol.ToLower());
+        }
+
+        public async Task<bool?> UpdatePartyAsync(Guid Id, PartyModel partyModel) {
+            if (await GetPartyExists(partyModel))
+            {
+                return null;
+
+            }
+
+
+            var party = await dbContext.Parties.FindAsync(Id);
+            if (party == null) 
+                {
+                    return false;
+                }
+            
+            party.Name = partyModel.Name;
+            party.Symbol = partyModel.Symbol;
+            await dbContext.SaveChangesAsync();
+            return true;
+        }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VotingApp.API.Data;
 
@@ -11,9 +12,11 @@ using VotingApp.API.Data;
 namespace VotingApp.API.Migrations
 {
     [DbContext(typeof(VotingAppDbContext))]
-    partial class VotingAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250309173852_unique State Name")]
+    partial class uniqueStateName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,22 +115,13 @@ namespace VotingApp.API.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Symbol")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Symbol")
-                        .IsUnique();
-
-                    b.HasIndex("Name", "Symbol")
-                        .IsUnique();
 
                     b.ToTable("Parties");
                 });
