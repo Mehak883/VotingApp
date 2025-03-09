@@ -25,6 +25,19 @@ namespace VotingApp.API.Data
             modelBuilder.Entity<Candidate>()
                 .HasIndex(c => new { c.StateId, c.PartyId })
                 .IsUnique();
+
+            modelBuilder.Entity<State>()
+                .HasIndex(s => s.Name)
+                .IsUnique();
+            modelBuilder.Entity<Party>()
+               .HasIndex(p => p.Name)
+               .IsUnique();
+            modelBuilder.Entity<Party>()
+              .HasIndex(p => p.Symbol)
+              .IsUnique();
+            modelBuilder.Entity<Party>()
+               .HasIndex(p => new { p.Name, p.Symbol })
+               .IsUnique();
         }
 
     }
