@@ -1,12 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+﻿using Microsoft.AspNetCore.Mvc;
 using VotingApp.API.DTOs;
-using VotingApp.API.Models;
+using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
 {
@@ -14,20 +8,17 @@ namespace VotingApp.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<AuthUser> _userManager;
-        private readonly IConfiguration _config;
-        public AuthController(UserManager<AuthUser> userManager, IConfiguration config)
+        private readonly IAuthService _authService;
+
+        public AuthController(IAuthService authService)
         {
-            _userManager = userManager;
-            _config = config;
+            _authService = authService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterModel model)
         {
-            var user = new AuthUser { UserName = model.Email, Email = model.Email, FullName = model.FullName };
-            var result = await _userManager.CreateAsync(user, model.Password);
-
+            var result = await _authService.RegisterAsync(model);
             if (result.Succeeded)
                 return Ok("User registered successfully!");
             return BadRequest(result.Errors);
@@ -36,25 +27,12 @@ namespace VotingApp.API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginModel model)
         {
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null || !(await _userManager.CheckPasswordAsync(user, model.Password)))
+            var token = await _authService.LoginAsync(model);
+            if (token == null)
                 return Unauthorized("Invalid credentials!");
 
-            var token = GenerateJwtToken(user);
             return Ok(new { token });
         }
-
-        private string GenerateJwtToken(AuthUser user)
-        {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
-            {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email)
-        };
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], claims, expires: DateTime.UtcNow.AddHours(2), signingCredentials: creds);
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
     }
+
 }
