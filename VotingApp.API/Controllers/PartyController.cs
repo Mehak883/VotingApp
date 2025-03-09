@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VotingApp.API.DTOs;
-using VotingApp.API.Services;
+using VotingApp.API.Models;
+using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PartyController : ControllerBase
@@ -16,15 +18,34 @@ namespace VotingApp.API.Controllers
             this.partyService = partyService;
         }
 
-        [HttpPost("add")]
-        //[Authorize(Roles ="Admin")]
-        public async Task<IActionResult> AddParty([FromBody] PartyModel partyModel)
+
+        
+        [HttpPost]
+        public async Task<IActionResult> AddParty(PartyModel partyModel)
         {
             var result = await partyService.AddPartyData(partyModel);
-            if (result)
-                return Ok(new { Message = "Party data added" });
+            if (result != null)
+            {
+                return Ok(new
+                {
+                    Message = "Party data added successfully",
+                    Party = result
+                });
+            }
 
             return BadRequest("Data adding failed");
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetParty(Guid id)
+        {
+            var party = await partyService.GetPartyData(id);
+
+            if (party != null)
+                return Ok(party);
+
+            return NotFound("Party not found");
+        }
+
     }
 }

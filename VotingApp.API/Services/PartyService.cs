@@ -1,5 +1,6 @@
 ﻿using VotingApp.API.Data;
 using VotingApp.API.DTOs;
+using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Services
 {
@@ -12,7 +13,7 @@ namespace VotingApp.API.Services
             this.dbContext = dbContext;
         }
 
-        public async Task<bool> AddPartyData(PartyModel partyModel)
+        public async Task<PartyResponseDto?> AddPartyData(PartyModel partyModel)
         {
             var party = new Models.Party
             {
@@ -24,7 +25,25 @@ namespace VotingApp.API.Services
 
             dbContext.Parties.Add(party);
             await dbContext.SaveChangesAsync();
-            return true;
+            return new PartyResponseDto
+            {
+                Id = party.Id,
+                Name = party.Name,
+                Symbol = party.Symbol
+            };
+        }
+
+        public async Task<PartyResponseDto?> GetPartyData(Guid id)
+        {
+            var party = await dbContext.Parties.FindAsync(id);
+            if (party == null) return null;
+
+            return new PartyResponseDto
+            {
+                Id = party.Id,
+                Name = party.Name,
+                Symbol = party.Symbol
+            };
         }
 
     }
