@@ -5,8 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VotingApp.API.Data;
 using VotingApp.API.Models;
+
 using VotingApp.API.Services.Interfaces;
 using VotingApp.API.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +50,14 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<IPartyService, PartyService>();
+
+
+
 var app = builder.Build();
+
+           
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -62,5 +71,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();
