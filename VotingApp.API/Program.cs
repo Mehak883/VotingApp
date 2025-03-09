@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddSingleton<ILoggerService, LoggerService>();
 
 builder.Services.AddControllers();
