@@ -9,7 +9,7 @@ using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
 {
-   
+
     [Route("api/[controller]")]
     [ApiController]
     public class PartyController : ControllerBase
@@ -27,7 +27,6 @@ namespace VotingApp.API.Controllers
             var result = await partyService.GetAllPartiesAsync();
             return Ok(new { data = result});
         }
-
 
         [Authorize]
         [HttpPost]
@@ -58,7 +57,7 @@ namespace VotingApp.API.Controllers
         }
         [Authorize]
         [HttpPatch]
-        public async Task<IActionResult> UpdateState(Guid Id, PartyModel partyModel)
+        public async Task<IActionResult> UpdateParty(Guid Id, PartyModel partyModel)
         {
             bool? result = await partyService.UpdatePartyAsync(Id,partyModel );
             if (result == null)

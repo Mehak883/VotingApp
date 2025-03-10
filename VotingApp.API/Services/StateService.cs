@@ -51,7 +51,7 @@ namespace VotingApp.API.Services
 
             if (stateExists)
             {
-                return null; // Indicating state already exists
+                return null; 
 
             }
 

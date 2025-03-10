@@ -6,14 +6,16 @@ namespace VotingApp.API.Models
     {
         public Guid Id { get; set; }
 
-        [Required]
+        
         [ForeignKey("Voter")]
-
-        public String VoterId { get; set; }
-        [Required]
+        public required String VoterId { get; set; }
+       
         [ForeignKey("Candidate")]
         public Guid CandidateId { get; set; }
         [Required]
         public DateTime DateTimeNow { get; set; } = DateTime.UtcNow;
+
+        public Voter Voter { get; set; }
+        public Candidate Candidate { get; set; }
 }
 }

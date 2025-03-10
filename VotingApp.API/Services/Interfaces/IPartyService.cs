@@ -9,6 +9,5 @@ namespace VotingApp.API.Services.Interfaces
         Task<PartyResponseDto?> GetPartyData(Guid id);
         Task<bool?> UpdatePartyAsync(Guid Id, PartyModel partyModel);
 
-
     }
 }
