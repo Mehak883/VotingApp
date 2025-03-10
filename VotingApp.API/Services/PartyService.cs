@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
-using VotingApp.API.DTOs;
+using VotingApp.API.DTOs.Party;
 using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Services

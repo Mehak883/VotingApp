@@ -1,4 +1,4 @@
-﻿namespace VotingApp.API.DTOs
+﻿namespace VotingApp.API.DTOs.Party
 {
     public class PartyResponseDto
     {

@@ -150,6 +150,30 @@ namespace VotingApp.API.Migrations
                     b.ToTable("States");
                 });
 
+            modelBuilder.Entity("VotingApp.API.Models.StateResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CandidateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("VoteCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
+
+                    b.HasIndex("StateId");
+
+                    b.ToTable("StateResult");
+                });
+
             modelBuilder.Entity("VotingApp.API.Models.Vote", b =>
                 {
                     b.Property<Guid>("Id")
@@ -167,6 +191,8 @@ namespace VotingApp.API.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CandidateId");
 
                     b.HasIndex("VoterId")
                         .IsUnique();
@@ -206,6 +232,44 @@ namespace VotingApp.API.Migrations
                     b.Navigation("Party");
 
                     b.Navigation("State");
+                });
+
+            modelBuilder.Entity("VotingApp.API.Models.StateResult", b =>
+                {
+                    b.HasOne("VotingApp.API.Models.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VotingApp.API.Models.State", "State")
+                        .WithMany()
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("State");
+                });
+
+            modelBuilder.Entity("VotingApp.API.Models.Vote", b =>
+                {
+                    b.HasOne("VotingApp.API.Models.Candidate", "Candidate")
+                        .WithMany()
+                        .HasForeignKey("CandidateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VotingApp.API.Models.Voter", "Voter")
+                        .WithMany()
+                        .HasForeignKey("VoterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Candidate");
+
+                    b.Navigation("Voter");
                 });
 
             modelBuilder.Entity("VotingApp.API.Models.Voter", b =>
