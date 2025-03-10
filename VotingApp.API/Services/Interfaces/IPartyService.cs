@@ -1,4 +1,4 @@
-﻿using VotingApp.API.DTOs;
+﻿using VotingApp.API.DTOs.Party;
 
 namespace VotingApp.API.Services.Interfaces
 {
