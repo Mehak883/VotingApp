@@ -16,8 +16,35 @@ namespace VotingApp.API.Data
         public DbSet<Candidate> Candidates { get; set; }
         public DbSet<Vote> Votes { get; set; }
         public DbSet<AuthUser> AuthUsers { get; set; }
+
+        public DbSet<StateResult> StateResult { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+            // StateResult relationships (no cascade delete)
+            modelBuilder.Entity<StateResult>()
+                .HasOne(sr => sr.State)
+                .WithMany()
+                .HasForeignKey(sr => sr.StateId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<StateResult>()
+                .HasOne(sr => sr.Candidate)
+                .WithMany()
+                .HasForeignKey(sr => sr.CandidateId)
+                .OnDelete(DeleteBehavior.Restrict);
+            //Votes relationships(no cascade delete)
+            modelBuilder.Entity<Vote>()
+                .HasOne(v => v.Voter)
+                .WithMany()
+                .HasForeignKey(v => v.VoterId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent multiple cascade paths
+            modelBuilder.Entity<Vote>()
+                .HasOne(v => v.Candidate)
+                .WithMany()
+                .HasForeignKey(v => v.CandidateId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent multiple cascade paths
+
             modelBuilder.Entity<Vote>()
                 .HasIndex(v => v.VoterId)
                 .IsUnique();
