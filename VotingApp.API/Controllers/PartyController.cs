@@ -9,6 +9,7 @@ using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class PartyController : ControllerBase
@@ -21,11 +22,12 @@ namespace VotingApp.API.Controllers
 
         [HttpGet]
         [Route("allParties")]
-public async Task<IActionResult> GetAllParties()
+    public async Task<IActionResult> GetAllParties()
         {
             var result = await partyService.GetAllPartiesAsync();
             return Ok(new { data = result});
         }
+
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddParty(PartyModel partyModel)

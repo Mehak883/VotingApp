@@ -20,7 +20,6 @@ namespace VotingApp.API.Services
             if (await GetPartyExists(partyModel))
             {
                 return null;
-
             }
 
             var party = new Models.Party
@@ -52,7 +51,7 @@ namespace VotingApp.API.Services
         public async Task<PartyResponseDto?> GetPartyData(Guid Id)
         {
            
-                var party = await dbContext.Parties.FindAsync(Id);
+            var party = await dbContext.Parties.FindAsync(Id);
             if (party == null) return null;
 
             return new PartyResponseDto
@@ -72,9 +71,7 @@ namespace VotingApp.API.Services
             if (await GetPartyExists(partyModel))
             {
                 return null;
-
             }
-
 
             var party = await dbContext.Parties.FindAsync(Id);
             if (party == null) 
