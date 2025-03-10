@@ -24,6 +24,7 @@ namespace VotingApp.API.Controllers
             {
                 return BadRequest(new { message = "Voter already exists" });
             }
+
           
                 return Ok(new
                 {
