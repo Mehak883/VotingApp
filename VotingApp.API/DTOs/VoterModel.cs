@@ -11,7 +11,6 @@ namespace VotingApp.API.DTOs
         public required String Id { get; set; }
 
         [Required]
-        [ForeignKey("State")]
         public Guid StateId { get; set; }
     }
 }

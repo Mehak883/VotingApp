@@ -3,5 +3,6 @@
     public class VoteResponseDTO
     {
         public Guid Id;
+        public required String Message;
     }
 }
