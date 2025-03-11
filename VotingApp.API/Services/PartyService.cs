@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.Party;
+using VotingApp.API.Exceptions;
 using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Services
@@ -19,7 +21,7 @@ namespace VotingApp.API.Services
 
             if (await GetPartyExists(partyModel))
             {
-                return null;
+                throw new ConflictException("Party already exist");
             }
 
             var party = new Models.Party
@@ -52,7 +54,7 @@ namespace VotingApp.API.Services
         {
            
             var party = await dbContext.Parties.FindAsync(Id);
-            if (party == null) return null;
+            if (party == null) throw new NotFoundException("Party not found");
 
             return new PartyResponseDto
             {
@@ -70,13 +72,13 @@ namespace VotingApp.API.Services
         public async Task<bool?> UpdatePartyAsync(Guid Id, PartyModel partyModel) {
             if (await GetPartyExists(partyModel))
             {
-                return null;
+                throw new ConflictException("Party already exist"); 
             }
 
             var party = await dbContext.Parties.FindAsync(Id);
             if (party == null) 
                 {
-                    return false;
+                    throw new NotFoundException("Party not found");
                 }
             
             party.Name = partyModel.Name;

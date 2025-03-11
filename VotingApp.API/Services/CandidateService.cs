@@ -2,6 +2,7 @@
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.Candidate;
 using VotingApp.API.DTOs.Party;
+using VotingApp.API.Exceptions;
 using VotingApp.API.Models;
 using VotingApp.API.Services.Interfaces;
 
@@ -23,7 +24,7 @@ namespace VotingApp.API.Services
 
             if (!stateExists || !partyExists)
             {
-                throw new Exception("Invalid StateId or PartyId.");
+                throw new NotFoundException("Invalid StateId or PartyId.");
             }
 
             var existingCandidate = await dbContext.Candidates
@@ -31,7 +32,7 @@ namespace VotingApp.API.Services
 
             if (existingCandidate)
             {
-                throw new Exception("A candidate from this party already exists in this state.");
+                throw new ConflictException("A candidate from this party already exists in this state.");
             }
 
 
@@ -52,7 +53,7 @@ namespace VotingApp.API.Services
             .Include(c => c.Party)
             .FirstOrDefaultAsync(c => c.Id == candidate.Id);
 
-            if (savedCandidate == null) return null;
+            if (savedCandidate == null) throw new ConflictException("A candidate from this party already exists in this state.");
 
             return new CandidateResponse
             {
@@ -72,7 +73,7 @@ namespace VotingApp.API.Services
             var candidate = await dbContext.Candidates.FindAsync(id);
             if(candidate == null)
             {
-                return false;
+                throw new NotFoundException("Candidate not found.");
             }
             dbContext.Candidates.Remove(candidate);
             await dbContext.SaveChangesAsync();
@@ -102,7 +103,7 @@ namespace VotingApp.API.Services
          var candidate = await dbContext.Candidates.Include(c => c.Party)  
         .Include(c => c.State) 
         .FirstOrDefaultAsync(c => c.Id == Id);
-            if (candidate == null) return null;
+            if (candidate == null) throw new NotFoundException("Candidate not found");
 
             return new CandidateResponse
             {
@@ -122,7 +123,7 @@ namespace VotingApp.API.Services
 
             if (candidate == null)
             {
-                return false; 
+                throw new NotFoundException("Candidate not found.") ; 
             }
 
        
@@ -141,7 +142,7 @@ namespace VotingApp.API.Services
 
             if (exists)
             {
-                return null; 
+                throw new ConflictException("Candidate with the same details already exists."); 
             }
 
            

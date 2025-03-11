@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.Vote;
+using VotingApp.API.Exceptions;
 using VotingApp.API.Models;
 using VotingApp.API.Services.Interfaces;
 
@@ -24,10 +25,8 @@ namespace VotingApp.API.Services
 
             if (currentLocal < _sessionStart || currentLocal > _sessionEnd)
             {
-                return new VoteResponseDTO
-                {
-                    Message = $"Voting is not allowed at this time. Voting session{currentLocal} is active between {_sessionStart} and {_sessionEnd}."
-                };
+                throw new ConflictException($"Voting is not allowed at this time. Voting session is active between {_sessionStart} and {_sessionEnd}.");
+               
             }
 
 
@@ -35,7 +34,8 @@ namespace VotingApp.API.Services
 
             if (voteCasted)
             {
-                return new VoteResponseDTO { Message = "Voter has already cast a vote." };
+                throw new ConflictException("Voter has already cast a vote.");
+
             }
 
             var voter = await _context.Voters.FindAsync(voteModel.VoterId);
@@ -43,18 +43,17 @@ namespace VotingApp.API.Services
 
             if (voter == null)
             {
-
-                return new VoteResponseDTO { Message = "Voter Id is not valid" };
+                throw new NotFoundException("Voter Id is not valid"); 
             }
 
             if (candidate == null)
             {
-                return new VoteResponseDTO { Message = "Candidate not found." };
+                throw new NotFoundException("Candidate not found.");
             }
 
             if (voter.StateId != candidate.StateId)
             {
-                return new VoteResponseDTO { Message = "Voter's state does not match candidate's state." };
+                throw new ConflictException ("Voter's state does not match candidate's state." );
             }
 
             Vote vote = new Vote { VoterId = voteModel.VoterId, CandidateId = voteModel.CandidateId ,DateTimeNow=currentLocal};
