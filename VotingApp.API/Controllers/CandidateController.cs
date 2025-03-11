@@ -32,16 +32,17 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> AddCandidate(CandidateRequest candidateRequest)
         {
             var result = await candidateService.AddCandidateData(candidateRequest);
-            if (result != null)
+
+            if (result == null)
             {
-                return Ok(new
-                {
-                    message = "Candidate data added successfully",
-                    data = result
-                });
+                return BadRequest(new { message = "A candidate from this party already exists in this state." });
             }
 
-            return BadRequest(new { message = "Candidate already exists" });
+            return Ok(new
+            {
+                message = "Candidate data added successfully",
+                data = result
+            });
         }
 
         [HttpGet("{id}")]
