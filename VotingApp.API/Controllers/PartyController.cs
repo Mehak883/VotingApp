@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VotingApp.API.DTOs.Party;
-using VotingApp.API.DTOs.State;
-using VotingApp.API.Models;
-using VotingApp.API.Services;
+
 using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
@@ -33,16 +30,14 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> AddParty(PartyModel partyModel)
         {
             var result = await partyService.AddPartyData(partyModel);
-            if (result != null)
-            {
+           
                 return Ok(new
                 {
                     message = "Party data added successfully",
                     data = result
                 });
-            }
+            
 
-            return BadRequest(new { message = "Party already exists" });
         }
 
         [HttpGet("{id}")]
@@ -50,22 +45,18 @@ namespace VotingApp.API.Controllers
         {
             var party = await partyService.GetPartyData(id);
 
-            if (party != null)
+            //if (party != null)
                 return Ok(new{data=party});
 
-            return NotFound("Party not found");
+            //return NotFound("Party not found");
         }
         [Authorize]
         [HttpPatch]
         public async Task<IActionResult> UpdateParty(Guid Id, PartyModel partyModel)
         {
             bool? result = await partyService.UpdatePartyAsync(Id,partyModel );
-            if (result == null)
-            {
-                return BadRequest(new { message = "Party already exists" });
 
-            }
-            if ((bool)!result) return NotFound("Party not found");
+            //if ((bool)!result) return NotFound("Party not found");
             return Ok(new
             {
                 message = "Party updated successfully"

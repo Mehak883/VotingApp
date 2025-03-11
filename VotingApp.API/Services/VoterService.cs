@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs;
+using VotingApp.API.Exceptions;
 using VotingApp.API.Models;
 using VotingApp.API.Services.Interfaces;
 
@@ -19,7 +20,7 @@ namespace VotingApp.API.Services
             bool voterExist = await _context.Voters.AnyAsync(v=>v.Id== voterModel.Id);
             if (voterExist)
             {
-                return null;
+                throw new ConflictException("Voter already exists");
             }
 
             var voter =new Voter{Id = voterModel.Id,StateId =voterModel.StateId}; 
