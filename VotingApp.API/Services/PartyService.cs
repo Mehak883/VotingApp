@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.Party;
 using VotingApp.API.Exceptions;
@@ -23,12 +22,15 @@ namespace VotingApp.API.Services
             {
                 throw new ConflictException("Party already exist");
             }
-
+            if (await GetSymbolExists(partyModel))
+            {
+                throw new ConflictException("Symbol already taken by another party");
+            }
             var party = new Models.Party
             {
                 Id= Guid.NewGuid(),
-                Name = partyModel.Name,
-                Symbol = partyModel.Symbol,
+                Name = partyModel.Name.ToUpper(),
+                Symbol = partyModel.Symbol.ToUpper(),
             };
 
 
@@ -66,24 +68,38 @@ namespace VotingApp.API.Services
 
         public async Task<bool> GetPartyExists(PartyModel partyModel)
         {
-            return await dbContext.Parties.AnyAsync(p => p.Name.ToLower() == partyModel.Name.ToLower() || p.Symbol == partyModel.Symbol.ToLower());
+            return await dbContext.Parties.AnyAsync(p => p.Name.ToUpper() == partyModel.Name.ToUpper());
         }
-
+        public async Task<bool> GetSymbolExists(PartyModel partyModel)
+        {
+            return await dbContext.Parties.AnyAsync(p => p.Symbol.ToUpper() == partyModel.Symbol.ToUpper());
+        }
+        public async Task<bool> GetPartyExistsUpdate(PartyModel partyModel,Guid Id)
+        {
+            return await dbContext.Parties.AnyAsync(p => p.Name.ToUpper() == partyModel.Name.ToUpper() && p.Id!=Id);
+        }
+        public async Task<bool> GetSymbolExistsUpdate(PartyModel partyModel,Guid Id)
+        {
+            return await dbContext.Parties.AnyAsync(p => p.Symbol.ToUpper() == partyModel.Symbol.ToUpper() && p.Id != Id);
+        }
         public async Task<bool?> UpdatePartyAsync(Guid Id, PartyModel partyModel) {
 
-            if (await GetPartyExists(partyModel))
+
+            if (await GetPartyExistsUpdate(partyModel,Id))
             {
                 throw new ConflictException("Party already exist");
             }
-
+            if (await GetSymbolExistsUpdate(partyModel, Id)){
+                throw new ConflictException("Symbol already taken");
+            }
             var party = await dbContext.Parties.FindAsync(Id);
             if (party == null) 
                 {
                     throw new NotFoundException("Party not found");
                 }
             
-            party.Name = partyModel.Name;
-            party.Symbol = partyModel.Symbol;
+            party.Name = partyModel.Name.ToUpper();
+            party.Symbol = partyModel.Symbol.ToUpper();
             await dbContext.SaveChangesAsync();
             return true;
         }
