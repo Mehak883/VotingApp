@@ -33,11 +33,6 @@ namespace VotingApp.API.Controllers
         {
             var result = await candidateService.AddCandidateData(candidateRequest);
 
-            if (result == null)
-            {
-                return BadRequest(new { message = "A candidate from this party already exists in this state." });
-            }
-
             return Ok(new
             {
                 message = "Candidate data added successfully",
@@ -50,10 +45,9 @@ namespace VotingApp.API.Controllers
         {
             var candidate = await candidateService.GetCandidateData(id);
 
-            if (candidate != null)
+            //if (candidate != null)
                 return Ok(new { data = candidate });
 
-            return NotFound("Candidate not found");
         }
 
         [Authorize]
@@ -62,12 +56,7 @@ namespace VotingApp.API.Controllers
         {
             var isDeleted = await candidateService.DeleteCandidateData(id);
 
-            if (!isDeleted)
-            {
-                return NotFound(new { message = "Candidate not found." });
-            }
-
-            return Ok(new { message = "Candidate removed" });
+            return Ok(new { message = "Success" });
         }
 
         [Authorize]
@@ -75,16 +64,6 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> UpdateCandidate(Guid id, CandidateRequest candidateRequest)
         {
             bool? result = await candidateService.UpdateCandidateData(id, candidateRequest);
-
-            if (result == null)
-            {
-                return BadRequest(new { message = "Candidate with the same details already exists." });
-            }
-
-            if ((bool)!result)
-            {
-                return NotFound(new { message = "Candidate not found." });
-            }
 
             return Ok(new { message = "Candidate updated successfully." });
         }
