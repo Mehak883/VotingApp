@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using VotingApp.API.DTOs.State;
+using VotingApp.API.Exceptions;
 using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
@@ -27,7 +28,7 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> GetStateById(Guid Id)
         {
             var state = await _stateService.GetStateByIdAsync(Id);
-            if (state == null) return NotFound("State not found");
+        
 
             return Ok(new { data=state });
         }
@@ -37,10 +38,6 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> AddState(StateRequest stateRequest)
         {
             var state = await _stateService.AddStateAsync(stateRequest);
-            if (state == null)
-            {
-                return BadRequest(new { message = "State already exists" });
-            }
             return Ok(new
             {
                 message = "State added successfully",
@@ -49,18 +46,11 @@ namespace VotingApp.API.Controllers
         }
 
         [Authorize]
-        [HttpPatch]
-        public async Task<IActionResult> UpdateState(Guid Id,StateRequest stateRequest)
+        [HttpPatch("{Id}")]
+        public async Task<IActionResult> UpdateState(Guid Id, StateRequest stateRequest)
         {
-            bool? result = await _stateService.UpdateStateAsync(Id, stateRequest);
-            if(result==null)
-            {
-                return BadRequest(new { message = "State already exists" });
-
-            }
-            if ((bool)!result) return NotFound("State not found");
-            return Ok(new {message = "State updated successfully"
-        });
+            var result = await _stateService.UpdateStateAsync(Id, stateRequest);
+            return Ok(new { message = "State updated successfully" });
         }
     }
 }
