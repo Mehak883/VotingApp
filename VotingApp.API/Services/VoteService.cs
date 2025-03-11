@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
+using VotingApp.API.DTOs;
 using VotingApp.API.DTOs.Vote;
 using VotingApp.API.Exceptions;
 using VotingApp.API.Models;
@@ -10,23 +11,26 @@ namespace VotingApp.API.Services
     public class VoteService:IVoteService
     {
         private readonly VotingAppDbContext _context;
-        private readonly DateTime _sessionStart;
-        private readonly DateTime _sessionEnd;
-
-        public VoteService(VotingAppDbContext context,IConfiguration configuration)
+        private readonly IVoteSessionService _voteSessionService;
+        public VoteService(VotingAppDbContext context,IConfiguration configuration, IVoteSessionService voteSessionService)
         {
+            _voteSessionService = voteSessionService;            
             _context = context;
-            _sessionStart = DateTime.SpecifyKind(DateTime.Parse(configuration["VotingSession:Start"]), DateTimeKind.Local);
-            _sessionEnd = DateTime.SpecifyKind(DateTime.Parse(configuration["VotingSession:End"]), DateTimeKind.Local);
+            //_sessionStart = DateTime.SpecifyKind(DateTime.Parse(configuration["VotingSession:Start"]), DateTimeKind.Local);
+            //_sessionEnd = DateTime.SpecifyKind(DateTime.Parse(configuration["VotingSession:End"]), DateTimeKind.Local);
+            //this.voteSessionService = voteSessionService;
         }
         public async Task<bool> CastVoteAsync(VoteModel voteModel)
         {
+            VotingTimingDTO votingTiming= _voteSessionService.LoadVotingTimings();
             DateTime currentLocal = DateTime.Now;
-
-            if (currentLocal < _sessionStart || currentLocal > _sessionEnd)
+            if (!DateTime.TryParse(votingTiming.StartTime, out DateTime startTime))
+                throw new BadRequestException("Invalid start time format.");
+            if (!DateTime.TryParse(votingTiming.EndTime, out DateTime endTime))
+                throw new BadRequestException("Invalid end time format.");
+            if (currentLocal < startTime || currentLocal > endTime)
             {
-                throw new ConflictException($"Voting is not allowed at this time. Voting session is active between {_sessionStart} and {_sessionEnd}.");
-               
+                throw new BadRequestException($"Voting is not allowed at this time. Voting session is active between {startTime} and {endTime}.");
             }
 
 

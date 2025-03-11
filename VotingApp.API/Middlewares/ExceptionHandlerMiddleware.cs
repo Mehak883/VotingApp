@@ -1,6 +1,5 @@
 ﻿using VotingApp.API.Exceptions;
 using UnauthorizedAccessException = VotingApp.API.Exceptions.UnauthorizedAccessException;
-//using UnauthorizedAccessException = VotingApp.API.Exceptions.UnauthorizedAccessException;
 
 namespace VotingApp.API.Middlewares
 {
@@ -47,7 +46,7 @@ namespace VotingApp.API.Middlewares
 
                 default:
                     statusCode = StatusCodes.Status500InternalServerError;
-                    errorMessage = "An unexpected error occurred";
+                    errorMessage = ex.Message;
                     break;
             }
 
