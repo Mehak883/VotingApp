@@ -19,13 +19,7 @@ namespace VotingApp.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddVoter(VoterModel voterModel)
         {
-            var voter = await voterService.AddVoterAsync(voterModel);
-            if (voter == null)
-            {
-                return BadRequest(new { message = "Voter already exists" });
-            }
-
-          
+            var voter = await voterService.AddVoterAsync(voterModel);          
                 return Ok(new
                 {
                     message = "Voter added successfully",
