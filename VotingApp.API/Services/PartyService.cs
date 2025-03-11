@@ -70,9 +70,10 @@ namespace VotingApp.API.Services
         }
 
         public async Task<bool?> UpdatePartyAsync(Guid Id, PartyModel partyModel) {
+
             if (await GetPartyExists(partyModel))
             {
-                throw new ConflictException("Party already exist"); 
+                throw new ConflictException("Party already exist");
             }
 
             var party = await dbContext.Parties.FindAsync(Id);

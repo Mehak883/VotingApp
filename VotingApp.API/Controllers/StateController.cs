@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Mvc;
+using VotingApp.API.DTOs;
+using VotingApp.API.DTOs.Party;
 using VotingApp.API.DTOs.State;
 using VotingApp.API.Exceptions;
+using VotingApp.API.Models;
 using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
@@ -17,20 +20,21 @@ namespace VotingApp.API.Controllers
         {
             _stateService = stateService;
         }
-
+        [Route("allStates")]
         [HttpGet]
         public async Task<IActionResult> GetAllStates()
         {
             List<StateResponse> states = await _stateService.GetAllStatesAsync();
-            return Ok(new { data = states });
+            var response = new ApiResponseDTO<List<StateResponse>>(false, 200, "OK", states);
+            return Ok(response);
         }
         [HttpGet("{Id}")]
         public async Task<IActionResult> GetStateById(Guid Id)
         {
             var state = await _stateService.GetStateByIdAsync(Id);
         
-
-            return Ok(new { data=state });
+            var response = new ApiResponseDTO<StateResponse>(false, 200, "OK", state);
+            return Ok(response);
         }
 
         [Authorize]
@@ -38,11 +42,9 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> AddState(StateRequest stateRequest)
         {
             var state = await _stateService.AddStateAsync(stateRequest);
-            return Ok(new
-            {
-                message = "State added successfully",
-                data = state
-            });
+            var response = new ApiResponseDTO<StateResponse>(false, 200, "OK", state);
+            return Ok(response);
+         
         }
 
         [Authorize]
@@ -50,7 +52,8 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> UpdateState(Guid Id, StateRequest stateRequest)
         {
             var result = await _stateService.UpdateStateAsync(Id, stateRequest);
-            return Ok(new { message = "State updated successfully" });
+            var response = new ApiResponseDTO<bool?>(false, 200, "OK", null,result);
+            return Ok(response);
         }
     }
 }
