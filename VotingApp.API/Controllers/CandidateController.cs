@@ -70,7 +70,7 @@ namespace VotingApp.API.Controllers
             return Ok(new { message = "Candidate removed" });
         }
 
-   
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateCandidate(Guid id, CandidateRequest candidateRequest)
         {
