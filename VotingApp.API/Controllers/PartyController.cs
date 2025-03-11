@@ -23,17 +23,17 @@ namespace VotingApp.API.Controllers
     public async Task<IActionResult> GetAllParties()
         {
             var result = await partyService.GetAllPartiesAsync();
-            var response = new ApiResponseDTO<List<PartyResponseDto>>(false, 200, "OK", result);
+            var response = new ApiResponseDTO<List<PartyResponse>>(false, 200, "OK", result);
 
             return Ok(response);
         }
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddParty(PartyModel partyModel)
+        public async Task<IActionResult> AddParty(PartyRequest partyModel)
         {
             var result = await partyService.AddPartyData(partyModel);
-            var response = new ApiResponseDTO<PartyResponseDto>(false, 200, "OK", result);
+            var response = new ApiResponseDTO<PartyResponse>(false, 200, "OK", result);
             return Ok(response);
 
 
@@ -44,15 +44,15 @@ namespace VotingApp.API.Controllers
         {
             var party = await partyService.GetPartyData(id);
 
-            var response = new ApiResponseDTO<PartyResponseDto>(false, 200, "OK", party);
+            var response = new ApiResponseDTO<PartyResponse>(false, 200, "OK", party);
             return Ok(response);
 
         }
         [Authorize]
         [HttpPatch]
-        public async Task<IActionResult> UpdateParty(Guid Id, PartyModel partyModel)
+        public async Task<IActionResult> UpdateParty(Guid Id, PartyRequest partyRequest)
         {
-            bool? result = await partyService.UpdatePartyAsync(Id,partyModel );
+            bool? result = await partyService.UpdatePartyAsync(Id,partyRequest);
             var response = new ApiResponseDTO<bool?>(false, 200, "OK",null, (bool)result);
             return Ok(response);
         }

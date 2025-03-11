@@ -15,50 +15,50 @@ namespace VotingApp.API.Services
             this.dbContext = dbContext;
         }
 
-        public async Task<PartyResponseDto?> AddPartyData(PartyModel partyModel)
+        public async Task<PartyResponse?> AddPartyData(PartyRequest partyRequest)
         {
 
-            if (await GetPartyExists(partyModel))
+            if (await GetPartyExists(partyRequest))
             {
                 throw new ConflictException("Party already exist");
             }
-            if (await GetSymbolExists(partyModel))
+            if (await GetSymbolExists(partyRequest))
             {
                 throw new ConflictException("Symbol already taken by another party");
             }
             var party = new Models.Party
             {
                 Id= Guid.NewGuid(),
-                Name = partyModel.Name.ToUpper(),
-                Symbol = partyModel.Symbol.ToUpper(),
+                Name = partyRequest.Name.ToUpper(),
+                Symbol = partyRequest.Symbol.ToUpper(),
             };
 
 
             dbContext.Parties.Add(party);
             await dbContext.SaveChangesAsync();
-            return new PartyResponseDto
+            return new PartyResponse
             {
                 Id = party.Id,
                 Name = party.Name,
                 Symbol = party.Symbol
             };
         }
-        public async Task<List<PartyResponseDto>> GetAllPartiesAsync()
+        public async Task<List<PartyResponse>> GetAllPartiesAsync()
         {
             return await dbContext.Parties
-               .Select(p => new PartyResponseDto { Id = p.Id, Name = p.Name,Symbol=p.Symbol })
+               .Select(p => new PartyResponse { Id = p.Id, Name = p.Name,Symbol=p.Symbol })
                .ToListAsync();
         }
 
 
 
-        public async Task<PartyResponseDto?> GetPartyData(Guid Id)
+        public async Task<PartyResponse?> GetPartyData(Guid Id)
         {
            
             var party = await dbContext.Parties.FindAsync(Id);
             if (party == null) throw new NotFoundException("Party not found");
 
-            return new PartyResponseDto
+            return new PartyResponse
             {
                 Id = party.Id,
                 Name = party.Name,
@@ -66,30 +66,30 @@ namespace VotingApp.API.Services
             };
         }
 
-        public async Task<bool> GetPartyExists(PartyModel partyModel)
+        public async Task<bool> GetPartyExists(PartyRequest partyRequest)
         {
-            return await dbContext.Parties.AnyAsync(p => p.Name.ToUpper() == partyModel.Name.ToUpper());
+            return await dbContext.Parties.AnyAsync(p => p.Name.ToUpper() == partyRequest.Name.ToUpper());
         }
-        public async Task<bool> GetSymbolExists(PartyModel partyModel)
+        public async Task<bool> GetSymbolExists(PartyRequest partyRequest)
         {
-            return await dbContext.Parties.AnyAsync(p => p.Symbol.ToUpper() == partyModel.Symbol.ToUpper());
+            return await dbContext.Parties.AnyAsync(p => p.Symbol.ToUpper() == partyRequest.Symbol.ToUpper());
         }
-        public async Task<bool> GetPartyExistsUpdate(PartyModel partyModel,Guid Id)
+        public async Task<bool> GetPartyExistsUpdate(PartyRequest partyRequest, Guid Id)
         {
-            return await dbContext.Parties.AnyAsync(p => p.Name.ToUpper() == partyModel.Name.ToUpper() && p.Id!=Id);
+            return await dbContext.Parties.AnyAsync(p => p.Name.ToUpper() == partyRequest.Name.ToUpper() && p.Id!=Id);
         }
-        public async Task<bool> GetSymbolExistsUpdate(PartyModel partyModel,Guid Id)
+        public async Task<bool> GetSymbolExistsUpdate(PartyRequest partyRequest,Guid Id)
         {
-            return await dbContext.Parties.AnyAsync(p => p.Symbol.ToUpper() == partyModel.Symbol.ToUpper() && p.Id != Id);
+            return await dbContext.Parties.AnyAsync(p => p.Symbol.ToUpper() == partyRequest.Symbol.ToUpper() && p.Id != Id);
         }
-        public async Task<bool?> UpdatePartyAsync(Guid Id, PartyModel partyModel) {
+        public async Task<bool?> UpdatePartyAsync(Guid Id, PartyRequest partyRequest) {
 
 
-            if (await GetPartyExistsUpdate(partyModel,Id))
+            if (await GetPartyExistsUpdate(partyRequest,Id))
             {
                 throw new ConflictException("Party already exist");
             }
-            if (await GetSymbolExistsUpdate(partyModel, Id)){
+            if (await GetSymbolExistsUpdate(partyRequest, Id)){
                 throw new ConflictException("Symbol already taken");
             }
             var party = await dbContext.Parties.FindAsync(Id);
@@ -98,8 +98,8 @@ namespace VotingApp.API.Services
                     throw new NotFoundException("Party not found");
                 }
             
-            party.Name = partyModel.Name.ToUpper();
-            party.Symbol = partyModel.Symbol.ToUpper();
+            party.Name = partyRequest.Name.ToUpper();
+            party.Symbol = partyRequest.Symbol.ToUpper();
             await dbContext.SaveChangesAsync();
             return true;
         }

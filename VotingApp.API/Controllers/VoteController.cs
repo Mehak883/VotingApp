@@ -16,10 +16,10 @@ namespace VotingApp.API.Controllers
         }
 
         [HttpPost("cast")]
-        public async Task<IActionResult> CastVote(VoteModel voteModel)
+        public async Task<IActionResult> CastVote(VoteRequest voteRequest)
         {
 
-            var result = await _voteService.CastVoteAsync(voteModel);
+            var result = await _voteService.CastVoteAsync(voteRequest);
 
            
             var response = new ApiResponseDTO<bool?>(false, 200, "OK",null,result);

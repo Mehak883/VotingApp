@@ -20,7 +20,7 @@ namespace VotingApp.API.Services
             //_sessionEnd = DateTime.SpecifyKind(DateTime.Parse(configuration["VotingSession:End"]), DateTimeKind.Local);
             //this.voteSessionService = voteSessionService;
         }
-        public async Task<bool> CastVoteAsync(VoteModel voteModel)
+        public async Task<bool> CastVoteAsync(VoteRequest voteRequest)
         {
             VotingTimingDTO votingTiming= _voteSessionService.LoadVotingTimings();
             DateTime currentLocal = DateTime.Now;
@@ -34,7 +34,7 @@ namespace VotingApp.API.Services
             }
 
 
-            bool voteCasted = await _context.Votes.AnyAsync(v => v.VoterId == voteModel.VoterId);
+            bool voteCasted = await _context.Votes.AnyAsync(v => v.VoterId == voteRequest.VoterId);
 
             if (voteCasted)
             {
@@ -42,8 +42,8 @@ namespace VotingApp.API.Services
 
             }
 
-            var voter = await _context.Voters.FindAsync(voteModel.VoterId);
-            var candidate = await _context.Candidates.FindAsync(voteModel.CandidateId);
+            var voter = await _context.Voters.FindAsync(voteRequest.VoterId);
+            var candidate = await _context.Candidates.FindAsync(voteRequest.CandidateId);
 
             if (voter == null)
             {
@@ -60,7 +60,7 @@ namespace VotingApp.API.Services
                 throw new ConflictException ("Voter's state does not match candidate's state." );
             }
 
-            Vote vote = new Vote { VoterId = voteModel.VoterId, CandidateId = voteModel.CandidateId ,DateTimeNow=currentLocal};
+            Vote vote = new Vote { VoterId = voteRequest.VoterId, CandidateId = voteRequest.CandidateId ,DateTimeNow=currentLocal};
             await _context.Votes.AddAsync(vote);
             await _context.SaveChangesAsync();
 
