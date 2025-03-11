@@ -1,12 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using VotingApp.API.DTOs;
 using VotingApp.API.DTOs.Candidate;
-using VotingApp.API.DTOs.Party;
-using VotingApp.API.Models;
-using VotingApp.API.Services;
 using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
