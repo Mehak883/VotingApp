@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VotingApp.API.DTOs;
+using VotingApp.API.Services;
 
 
 namespace VotingApp.API.Controllers
@@ -23,7 +24,12 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> GetAllStateResults()
         {
             var stateResults = await stateResultService.GetStateResultsAsync();
-            return Ok(new { data = stateResults });
+
+            var response = new ApiResponseDTO<IEnumerable<stateResultModel>>(
+                false, 200, "OK", stateResults
+            );
+
+            return Ok(response);
         }
 
     }
