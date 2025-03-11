@@ -12,8 +12,8 @@ using VotingApp.API.Data;
 namespace VotingApp.API.Migrations
 {
     [DbContext(typeof(VotingAppDbContext))]
-    [Migration("20250309185222_unique Party field")]
-    partial class uniquePartyfield
+    [Migration("20250310074528_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

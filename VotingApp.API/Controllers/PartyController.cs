@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using VotingApp.API.DTOs;
+using VotingApp.API.DTOs.Party;
 using VotingApp.API.DTOs.State;
 using VotingApp.API.Models;
 using VotingApp.API.Services;
@@ -9,7 +9,7 @@ using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
 {
-    [Authorize]
+
     [Route("api/[controller]")]
     [ApiController]
     public class PartyController : ControllerBase
@@ -22,11 +22,13 @@ namespace VotingApp.API.Controllers
 
         [HttpGet]
         [Route("allParties")]
-public async Task<IActionResult> GetAllParties()
+    public async Task<IActionResult> GetAllParties()
         {
             var result = await partyService.GetAllPartiesAsync();
             return Ok(new { data = result});
         }
+
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddParty(PartyModel partyModel)
         {
@@ -55,7 +57,7 @@ public async Task<IActionResult> GetAllParties()
         }
         [Authorize]
         [HttpPatch]
-        public async Task<IActionResult> UpdateState(Guid Id, PartyModel partyModel)
+        public async Task<IActionResult> UpdateParty(Guid Id, PartyModel partyModel)
         {
             bool? result = await partyService.UpdatePartyAsync(Id,partyModel );
             if (result == null)

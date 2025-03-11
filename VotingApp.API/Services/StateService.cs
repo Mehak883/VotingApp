@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿ using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.State;
 using VotingApp.API.Models;
@@ -51,7 +51,7 @@ namespace VotingApp.API.Services
 
             if (stateExists)
             {
-                return null; // Indicating state already exists
+                return null; 
 
             }
 
