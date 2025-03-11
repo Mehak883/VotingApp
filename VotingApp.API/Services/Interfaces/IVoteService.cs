@@ -4,6 +4,6 @@ namespace VotingApp.API.Services.Interfaces
 {
     public interface IVoteService
     {
-        Task<VoteResponseDTO> CastVoteAsync(VoteModel voteModel);
+        Task<bool> CastVoteAsync(VoteModel voteModel);
     }
 }

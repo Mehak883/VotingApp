@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VotingApp.API.DTOs;
+using VotingApp.API.DTOs.State;
 using VotingApp.API.DTOs.Vote;
+using VotingApp.API.Models;
 using VotingApp.API.Services.Interfaces;
 
 namespace VotingApp.API.Controllers
@@ -21,14 +23,12 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> CastVote(VoteModel voteModel)
         {
 
-            var response = await _voteService.CastVoteAsync(voteModel);
+            var result = await _voteService.CastVoteAsync(voteModel);
 
-            if (response.Message != "Vote cast successfully!")
-            {
-                return BadRequest(new { message = response.Message });
-            }
+           
+            var response = new ApiResponseDTO<bool?>(false, 200, "OK",null,result);
 
-            return Ok( new {data= response});
+            return Ok(response);
             }
         }
     }
