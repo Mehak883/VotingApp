@@ -130,7 +130,28 @@ namespace VotingApp.API.Services
             bool isStateChanging = candidateRequest.StateId != Guid.Empty && candidateRequest.StateId != candidate.StateId;
             bool isPartyChanging = candidateRequest.PartyId != Guid.Empty && candidateRequest.PartyId != candidate.PartyId;
 
-         
+
+            if (isStateChanging)
+            {
+                var state = await dbContext.States.FindAsync(candidateRequest.StateId);
+                if (state == null)
+                {
+                    throw new NotFoundException("No such state exists.");
+                }
+                candidate.StateId = candidateRequest.StateId;
+            }
+
+            if (isPartyChanging)
+            {
+                var party = await dbContext.Parties.FindAsync(candidateRequest.PartyId);
+                if (party == null)
+                {
+                    throw new NotFoundException("No such party exists.");
+                }
+                candidate.PartyId = candidateRequest.PartyId;
+            }
+
+
             Guid updatedStateId = isStateChanging ? candidateRequest.StateId : candidate.StateId;
             Guid updatedPartyId = isPartyChanging ? candidateRequest.PartyId : candidate.PartyId;
 
@@ -148,15 +169,6 @@ namespace VotingApp.API.Services
            
             candidate.FullName = candidateRequest.FullName ?? candidate.FullName;
 
-            if (isStateChanging)
-            {
-                candidate.StateId = candidateRequest.StateId;
-            }
-
-            if (isPartyChanging)
-            {
-                candidate.PartyId = candidateRequest.PartyId;
-            }
 
             await dbContext.SaveChangesAsync();
             return true; 
