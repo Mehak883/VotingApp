@@ -29,7 +29,7 @@ namespace VotingApp.API.Controllers
         {
             var token = await _authService.LoginAsync(model);
             if (token == null)
-                return Unauthorized("Invalid credentials!");
+               throw new Exceptions.UnauthorizedAccessException("Invalid credentials");
 
             return Ok(new { token });
         }

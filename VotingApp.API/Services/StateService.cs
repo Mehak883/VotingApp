@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.State;
+using VotingApp.API.Exceptions;
 using VotingApp.API.Models;
 using VotingApp.API.Services.Interfaces;
 
@@ -19,6 +20,7 @@ namespace VotingApp.API.Services
             return await _context.States
                .Select(s => new StateResponse { Id = s.Id, Name = s.Name })
                .ToListAsync() ;
+
         }
 
         public async Task<StateResponse> GetStateByIdAsync(Guid Id)
@@ -26,7 +28,7 @@ namespace VotingApp.API.Services
             State ?state = await _context.States.FindAsync(Id);
             if (state == null)
             {
-                return null;
+               throw new NotFoundException("State not found");
             }
             return new StateResponse { Id = state.Id, Name = state.Name };
         }
@@ -36,8 +38,9 @@ namespace VotingApp.API.Services
 
             if (stateExists)
             {
-                    return null; 
-             
+                throw new ConflictException("State already exists");
+
+
             }
             var state = new State { Name = stateRequest.Name };
             _context.States.Add(state);
@@ -51,16 +54,18 @@ namespace VotingApp.API.Services
 
             if (stateExists)
             {
-                return null; 
+                throw new ConflictException("State already exists");
+
 
             }
 
             var state = await _context.States.FindAsync(Id);
             
             if (state == null) {
-                return false; 
+               throw new NotFoundException("State not found");
+
             }
-             
+
             state.Name = stateRequest.Name;
             await _context.SaveChangesAsync();
             return true;
