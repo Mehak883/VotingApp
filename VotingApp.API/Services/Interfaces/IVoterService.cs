@@ -5,6 +5,6 @@ namespace VotingApp.API.Services.Interfaces
 {
     public interface IVoterService
     {
-        Task<VoterModel> AddVoterAsync(VoterModel voterModel); 
+        Task<VoterModelDTO> AddVoterAsync(VoterModelDTO voterModel); 
     }
 }
