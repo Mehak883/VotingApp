@@ -23,6 +23,7 @@ builder.Services.AddScoped<IStateResults, StateResults>();
 
 builder.Services.AddScoped<IVoterService, VoterService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
+builder.Services.AddScoped<IVoteSessionService, VoteSessionService>();
 
 builder.Services.AddScoped<ICandidateService, CandidateService>();
 
