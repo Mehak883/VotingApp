@@ -19,8 +19,12 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddSingleton<ILoggerService, LoggerService>();
 builder.Services.AddScoped<IPartyService, PartyService>();
+
 builder.Services.AddScoped<IVoterService, VoterService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
+
+builder.Services.AddScoped<ICandidateService, CandidateService>();
+
 
 
 
@@ -88,7 +92,6 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
-        //ClockSkew = TimeSpan.Zero,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"]
     };
