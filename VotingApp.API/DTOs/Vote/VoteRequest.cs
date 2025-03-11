@@ -2,7 +2,7 @@
 
 namespace VotingApp.API.DTOs.Vote
 {
-    public class VoteModel
+    public class VoteRequest
     {
         [Required(ErrorMessage = "Voter Id is required")]
         public required String VoterId { get; set; }

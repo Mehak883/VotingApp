@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace VotingApp.API.DTOs
 {
-    public class VoterModel
+    public class VoterModelDTO
     {
         [Required(ErrorMessage =" Voter Id is required")]
         [Key]

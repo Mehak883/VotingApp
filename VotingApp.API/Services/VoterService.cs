@@ -15,24 +15,24 @@ namespace VotingApp.API.Services
             _context = context;
         }
 
-        public async Task<VoterModel> AddVoterAsync(VoterModel voterModel)
+        public async Task<VoterModelDTO> AddVoterAsync(VoterModelDTO voterModelDTO)
         {
-            bool voterExist = await _context.Voters.AnyAsync(v=>v.Id== voterModel.Id);
+            bool voterExist = await _context.Voters.AnyAsync(v=>v.Id== voterModelDTO.Id);
             if (voterExist)
             {
                 throw new ConflictException("Voter already exists");
             }
-            bool stateExist = await _context.States.AnyAsync(s => s.Id == voterModel.StateId);
+            bool stateExist = await _context.States.AnyAsync(s => s.Id == voterModelDTO.StateId);
 
             if (!stateExist)
             {
                 throw new NotFoundException("No State exists");
 
             }
-            var voter =new Voter{Id = voterModel.Id,StateId =voterModel.StateId}; 
+            var voter =new Voter{Id = voterModelDTO.Id,StateId =voterModelDTO.StateId}; 
             await _context.Voters.AddAsync(voter);
             await _context.SaveChangesAsync();
-            return voterModel;
+            return voterModelDTO;
         }
     }
 }
