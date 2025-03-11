@@ -19,7 +19,7 @@ namespace VotingApp.API.Services
             _sessionStart = DateTime.SpecifyKind(DateTime.Parse(configuration["VotingSession:Start"]), DateTimeKind.Local);
             _sessionEnd = DateTime.SpecifyKind(DateTime.Parse(configuration["VotingSession:End"]), DateTimeKind.Local);
         }
-        public async Task<VoteResponseDTO> CastVoteAsync(VoteModel voteModel)
+        public async Task<bool> CastVoteAsync(VoteModel voteModel)
         {
             DateTime currentLocal = DateTime.Now;
 
@@ -60,11 +60,7 @@ namespace VotingApp.API.Services
             await _context.Votes.AddAsync(vote);
             await _context.SaveChangesAsync();
 
-            return new VoteResponseDTO
-            {
-                Id = vote.Id,
-                Message= "Vote cast successfully!"
-            };
+            return true;
         }
     }
 }
