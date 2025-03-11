@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using VotingApp.API.Data;
+using VotingApp.API.Middlewares;
 using VotingApp.API.Models;
 using VotingApp.API.Services;
 using VotingApp.API.Services.Interfaces;
@@ -112,6 +113,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
