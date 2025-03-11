@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VotingApp.API.DTOs;
 using VotingApp.API.DTOs.Party;
 
 using VotingApp.API.Services.Interfaces;
@@ -22,7 +23,9 @@ namespace VotingApp.API.Controllers
     public async Task<IActionResult> GetAllParties()
         {
             var result = await partyService.GetAllPartiesAsync();
-            return Ok(new { data = result});
+            var response = new ApiResponseDTO<List<PartyResponseDto>>(false, 200, "OK", result);
+
+            return Ok(response);
         }
 
         [Authorize]
@@ -30,13 +33,9 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> AddParty(PartyModel partyModel)
         {
             var result = await partyService.AddPartyData(partyModel);
-           
-                return Ok(new
-                {
-                    message = "Party data added successfully",
-                    data = result
-                });
-            
+            var response = new ApiResponseDTO<PartyResponseDto>(false, 200, "OK", result);
+            return Ok(response);
+
 
         }
 
@@ -45,22 +44,17 @@ namespace VotingApp.API.Controllers
         {
             var party = await partyService.GetPartyData(id);
 
-            //if (party != null)
-                return Ok(new{data=party});
+            var response = new ApiResponseDTO<PartyResponseDto>(false, 200, "OK", party);
+            return Ok(response);
 
-            //return NotFound("Party not found");
         }
         [Authorize]
         [HttpPatch]
         public async Task<IActionResult> UpdateParty(Guid Id, PartyModel partyModel)
         {
             bool? result = await partyService.UpdatePartyAsync(Id,partyModel );
-
-            //if ((bool)!result) return NotFound("Party not found");
-            return Ok(new
-            {
-                message = "Party updated successfully"
-            });
+            var response = new ApiResponseDTO<bool?>(false, 200, "OK",null, (bool)result);
+            return Ok(response);
         }
     }
 }

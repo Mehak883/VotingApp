@@ -19,12 +19,10 @@ namespace VotingApp.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddVoter(VoterModel voterModel)
         {
-            var voter = await voterService.AddVoterAsync(voterModel);          
-                return Ok(new
-                {
-                    message = "Voter added successfully",
-                    data = voter
-                });
+            var voter = await voterService.AddVoterAsync(voterModel);         
+            var response = new ApiResponseDTO<VoterModel>(false, 200, "OK", voter);
+
+            return Ok(response);
             
 
         }
