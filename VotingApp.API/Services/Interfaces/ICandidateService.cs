@@ -7,7 +7,7 @@ namespace VotingApp.API.Services.Interfaces
     {
         Task<List<CandidateResponse>> GetAllCandidateData();
         Task<List<CandidateResponse>> GetCandidateDataByStateId(Guid StateId);
-        Task<List<CandidateResponse>> GetCandidateDataByPartyId(Guid PartyId);
+        //Task<List<CandidateResponse>> GetCandidateDataByPartyId(Guid PartyId);
 
         Task<CandidateResponse?> AddCandidateData(CandidateRequest candidateRequest);
         Task<CandidateResponse?> GetCandidateData(Guid id);

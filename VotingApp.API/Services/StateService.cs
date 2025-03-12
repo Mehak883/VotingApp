@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.State;
 using VotingApp.API.Exceptions;
@@ -36,6 +37,13 @@ namespace VotingApp.API.Services
         }
         public async Task<StateResponse> AddStateAsync(StateRequest stateRequest)
         {
+
+            if (!Regex.IsMatch(stateRequest.Name, @"^[a-zA-Z\s]+$"))
+            {
+                _logger.LogWarning("Invalid state name. Only alphabetic characters are allowed.");
+                throw new BadRequestException("State name should contain only alphabetic characters.");
+            }
+
             bool stateExists = await _context.States.AnyAsync(s => s.Name.ToLower() == stateRequest.Name.ToLower());
 
             if (stateExists)
@@ -53,6 +61,12 @@ namespace VotingApp.API.Services
 
         public async Task<bool?> UpdateStateAsync(Guid Id, StateRequest stateRequest )
         {
+            if (!Regex.IsMatch(stateRequest.Name, @"^[a-zA-Z\s]+$"))
+            {
+                _logger.LogWarning("Invalid state name. Only alphabetic characters are allowed.");
+                throw new BadRequestException("State name should contain only alphabetic characters.");
+            }
+
             bool stateExists = await _context.States.AnyAsync(s => s.Name.ToLower() == stateRequest.Name.ToLower());
 
             if (stateExists)
