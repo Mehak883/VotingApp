@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs;
@@ -15,7 +14,7 @@ namespace VotingApp.API.Services
             _voteSessionService = voteSessionService;
             _context = context;
         }
-        public async Task<IEnumerable<stateResultModel>> GetStateResultsAsync()
+        public async Task<IEnumerable<StateResultModel>> GetStateResultsAsync()
         {
 
             VotingTimingDTO votingTiming= _voteSessionService.LoadVotingTimings();
@@ -40,6 +39,7 @@ namespace VotingApp.API.Services
                 StateName = v.Voter.State.Name,
                 CandidateId = v.Candidate.Id,
                 CandidateName = v.Candidate.FullName,
+                partyid=v.Candidate.PartyId,
                 PartyName = v.Candidate.Party.Name,
                 PartySymbol = v.Candidate.Party.Symbol,
                 VoterId = v.VoterId 
@@ -47,13 +47,14 @@ namespace VotingApp.API.Services
             .ToListAsync();
    
             var voteResults = votes
-                .GroupBy(v => new { v.StateId, v.StateName, v.CandidateId, v.CandidateName, v.PartyName, v.PartySymbol })
-                .Select(g => new stateResultModel
+                .GroupBy(v => new { v.StateId, v.StateName, v.CandidateId, v.CandidateName, v.PartyName, v.PartySymbol,v.partyid })
+                .Select(g => new StateResultModel
                 {
                     StateId = g.Key.StateId,
                     StateName = g.Key.StateName,
                     CandidateId = g.Key.CandidateId,
                     CandidateName = g.Key.CandidateName,
+                    PartyId=g.Key.partyid,
                     PartyName = g.Key.PartyName,
                     PartySymbol = g.Key.PartySymbol,
                     VoteCount = g.Select(v => v.VoterId).Distinct().Count() 
@@ -71,7 +72,7 @@ namespace VotingApp.API.Services
 
                     if (topCandidates.Count > 1) 
                     {
-                        return new stateResultModel
+                        return new StateResultModel
                         {
                             StateId = stateGroup.Key.StateId,
                             StateName = stateGroup.Key.StateName,

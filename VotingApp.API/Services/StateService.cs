@@ -1,5 +1,4 @@
-﻿ using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.State;
 using VotingApp.API.Exceptions;
