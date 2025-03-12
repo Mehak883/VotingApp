@@ -11,19 +11,24 @@ namespace VotingApp.API.Services
     public class CandidateService :ICandidateService
     {
         private readonly VotingAppDbContext dbContext;
+        private readonly ILoggerService _logger;
 
-        public CandidateService(VotingAppDbContext dbContext)
+
+        public CandidateService(VotingAppDbContext dbContext, ILoggerService logger)
         {
             this.dbContext = dbContext;
+            _logger = logger;
         }
 
         public async Task<CandidateResponse?> AddCandidateData(CandidateRequest candidateRequest)
         {
+            _logger.LogInfo("Adding new candidate.");
             var stateExists = await dbContext.States.AnyAsync(s => s.Id == candidateRequest.StateId);
             var partyExists = await dbContext.Parties.AnyAsync(p => p.Id == candidateRequest.PartyId);
 
             if (!stateExists || !partyExists)
             {
+                _logger.LogWarning("Invalid StateId or PartyId.");
                 throw new NotFoundException("Invalid StateId or PartyId.");
             }
 
@@ -32,18 +37,19 @@ namespace VotingApp.API.Services
 
             if (existingCandidate)
             {
-                throw new ConflictException("A candidate from this party already exists in this state.");
+                _logger.LogWarning("Candidate from this party already exists in this state.");
+                throw new ConflictException("Candidate from this party already exists in this state.");
             }
 
 
-
-            var candidate = new Models.Candidate
+            var candidate = new Candidate
             {
                 Id = Guid.NewGuid(),
                 FullName = candidateRequest.FullName,
                 StateId = candidateRequest.StateId,
                 PartyId = candidateRequest.PartyId
             };
+            _logger.LogInfo($"Candidate {candidate.FullName} added successfully.");
 
             dbContext.Candidates.Add(candidate);
             await dbContext.SaveChangesAsync();
@@ -53,8 +59,10 @@ namespace VotingApp.API.Services
             .Include(c => c.Party)
             .FirstOrDefaultAsync(c => c.Id == candidate.Id);
 
-            if (savedCandidate == null) throw new ConflictException("A candidate from this party already exists in this state.");
+            if (savedCandidate == null) { 
 
+                throw new ConflictException("A candidate from this party already exists in this state."); }
+            _logger.LogInfo($"Candidate {candidate.FullName} added successfully.");
             return new CandidateResponse
             {
                 Id = candidate.Id,
@@ -70,18 +78,24 @@ namespace VotingApp.API.Services
 
         public async Task<bool> DeleteCandidateData(Guid id)
         {
+            _logger.LogInfo($"Deleting candidate with ID: {id}");
             var candidate = await dbContext.Candidates.FindAsync(id);
             if(candidate == null)
             {
+                _logger.LogWarning("Candidate not found.");
                 throw new NotFoundException("Candidate not found.");
             }
             dbContext.Candidates.Remove(candidate);
+
             await dbContext.SaveChangesAsync();
+            _logger.LogInfo($"Candidate with ID: {id} deleted successfully.");
             return true;
         }
 
         public async Task<List<CandidateResponse>> GetAllCandidateData()
         {
+            _logger.LogInfo("Fetching all candidates.");
+
             return await dbContext.Candidates
                 .Include(c => c.State)
                 .Include(c => c.Party)
@@ -99,9 +113,10 @@ namespace VotingApp.API.Services
         }
         public async Task<List<CandidateResponse>> GetCandidateDataByStateId(Guid StateId)
         {
+            _logger.LogInfo($"Fetching candidate with State ID: {StateId}");
             var state = await dbContext.States.FindAsync(StateId);
             if (state == null)
-            {
+            {_logger.LogWarning("No such state exists.");
                 throw new NotFoundException("No such state exists.");
             }
             
@@ -126,7 +141,7 @@ namespace VotingApp.API.Services
         {
             var party = await dbContext.Parties.FindAsync(PartyId);
             if (party == null)
-            {
+            {_logger.LogWarning("No such party exists.");
                 throw new NotFoundException("No such party exists.");
             }
 
@@ -148,10 +163,13 @@ namespace VotingApp.API.Services
         }
         public async Task<CandidateResponse?> GetCandidateData(Guid Id)
         {
-         var candidate = await dbContext.Candidates.Include(c => c.Party)  
+            _logger.LogInfo($"Updating candidate with ID: {Id}");
+            var candidate = await dbContext.Candidates.Include(c => c.Party)  
         .Include(c => c.State) 
         .FirstOrDefaultAsync(c => c.Id == Id);
-            if (candidate == null) throw new NotFoundException("Candidate not found");
+            if (candidate == null) {
+                _logger.LogWarning("Candidate not found.");
+                throw new NotFoundException("Candidate not found"); }
 
             return new CandidateResponse
             {
@@ -170,7 +188,7 @@ namespace VotingApp.API.Services
             var candidate = await dbContext.Candidates.FirstOrDefaultAsync(c => c.Id == id);
 
             if (candidate == null)
-            {
+            {_logger.LogWarning("Candidate not found.");
                 throw new NotFoundException("Candidate not found.") ; 
             }
 
@@ -184,6 +202,7 @@ namespace VotingApp.API.Services
                 var state = await dbContext.States.FindAsync(candidateRequest.StateId);
                 if (state == null)
                 {
+                    _logger.LogWarning("No such state exists.");
                     throw new NotFoundException("No such state exists.");
                 }
                 candidate.StateId = candidateRequest.StateId;
@@ -193,7 +212,7 @@ namespace VotingApp.API.Services
             {
                 var party = await dbContext.Parties.FindAsync(candidateRequest.PartyId);
                 if (party == null)
-                {
+                {_logger.LogWarning("No such party exists.");
                     throw new NotFoundException("No such party exists.");
                 }
                 candidate.PartyId = candidateRequest.PartyId;
@@ -211,6 +230,7 @@ namespace VotingApp.API.Services
 
             if (exists)
             {
+                _logger.LogWarning("Candidate with the same details already exists.");
                 throw new ConflictException("Candidate with the same details already exists."); 
             }
 
@@ -219,6 +239,7 @@ namespace VotingApp.API.Services
 
 
             await dbContext.SaveChangesAsync();
+            _logger.LogInfo($"Candidate with ID: {id} updated successfully.");
             return true; 
         }
 
