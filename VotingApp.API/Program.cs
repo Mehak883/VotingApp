@@ -105,7 +105,7 @@ builder.Services.AddAuthentication(options =>
     {
         OnChallenge = context =>
         {
-            // Suppress default WWW-Authenticate header
+            
             context.HandleResponse(); 
             var errorResponse = new
             {
@@ -113,7 +113,6 @@ builder.Services.AddAuthentication(options =>
                 code = 401,
                 errorMessage = "User not authorized"
             };
-            // Return a custom JSON response
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             context.Response.ContentType = "application/json";
             return context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
