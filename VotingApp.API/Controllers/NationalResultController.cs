@@ -18,7 +18,11 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> GetStateResultsAsync()
         {
             var nationalResults = await _nationalResult.GetStateResultsAsync();
-
+            if (nationalResults == null)
+            {
+                var stringResponse = new ApiResponseDTO<String>(false, 200, "OK", (String)"Result is not declared yet");
+                return Ok(stringResponse);
+            }
             if (nationalResults == null || !nationalResults.Any())
             {
                 var emptyResponse = new

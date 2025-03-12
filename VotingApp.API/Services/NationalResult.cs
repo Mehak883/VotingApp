@@ -1,18 +1,35 @@
 using VotingApp.API.DTOs;
+using VotingApp.API.Exceptions;
 using VotingApp.API.Services.Interfaces;
 namespace VotingApp.API.Services
 {
     public class NationalResult : INationalResult
     {
         private readonly IStateResults _stateResult;
+        private readonly IVoteSessionService _voteSessionService;
 
-        public NationalResult(IStateResults stateResult)
+        public NationalResult(IStateResults stateResult, IVoteSessionService voteSessionService)
         {
             _stateResult = stateResult;
+            _voteSessionService = voteSessionService;
         }
 
         public async Task<IEnumerable<NationalResultModel>> GetStateResultsAsync()
         {
+            VotingTimingDTO votingTiming = _voteSessionService.LoadVotingTimings();
+
+            DateTime currentLocal = DateTime.Now;
+            if (!DateTime.TryParse(votingTiming.StartTime, out DateTime startTime))
+                throw new BadRequestException("Invalid start time format.");
+            if (!DateTime.TryParse(votingTiming.EndTime, out DateTime endTime))
+                throw new BadRequestException("Invalid end time format.");
+
+            if (currentLocal < endTime)
+            {
+                return null;
+            }
+
+
             var stateResults = await _stateResult.GetStateResultsAsync();
                 if (stateResults == null || !stateResults.Any())
             {

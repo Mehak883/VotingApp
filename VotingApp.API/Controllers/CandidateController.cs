@@ -48,7 +48,6 @@ namespace VotingApp.API.Controllers
         }
 
         [HttpGet("by-state/{StateId}")]
-        //[Route("allPartyCandidates")]
 
         public async Task<IActionResult> GetCandidateByStateId(Guid StateId)
         {
@@ -58,7 +57,6 @@ namespace VotingApp.API.Controllers
         }
 
         [HttpGet("by-party/{PartyId}")]
-        //[Route("allStateCandidates")]
 
         public async Task<IActionResult> GetCandidateByPartyId(Guid PartyId)
         {

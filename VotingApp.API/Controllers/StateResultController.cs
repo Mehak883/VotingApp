@@ -26,19 +26,7 @@ if(stateResults == null)
             }
 
 
-            if (stateResults == null || !stateResults.Any())
-            {
-                var emptyResponse = new
-                {
-                    error = false,
-                    code = 200,
-                    responseCode = "OK",
-                    message="No results available",
-                };
-
-                return Ok(emptyResponse);
-            }
-
+          
             var response = new ApiResponseDTO<IEnumerable<stateResultModel>>(
                 false, 200, "OK", stateResults
             );

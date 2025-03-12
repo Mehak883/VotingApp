@@ -11,15 +11,18 @@ namespace VotingApp.API.Services
     public class VoteService:IVoteService
     {
         private readonly VotingAppDbContext _context;
+        private readonly ILoggerService _logger;
         private readonly IVoteSessionService _voteSessionService;
-        public VoteService(VotingAppDbContext context,IConfiguration configuration, IVoteSessionService voteSessionService)
+        public VoteService(VotingAppDbContext context,IConfiguration configuration, IVoteSessionService voteSessionService,ILoggerService logger)
         {
+            _logger = logger;
             _voteSessionService = voteSessionService;            
             _context = context;
            
         }
         public async Task<bool> CastVoteAsync(VoteRequest voteRequest)
         {
+            _logger.LogInfo($"Voter casting vote {voteRequest.VoterId}");
             VotingTimingDTO votingTiming= _voteSessionService.LoadVotingTimings();
             DateTime currentLocal = DateTime.Now;
             if (!DateTime.TryParse(votingTiming.StartTime, out DateTime startTime))
@@ -36,6 +39,8 @@ namespace VotingApp.API.Services
 
             if (voteCasted)
             {
+                _logger.LogWarning($"Duplicate vote attempt by Voter ID: {voteRequest.VoterId}");
+
                 throw new ConflictException("Voter has already cast a vote.");
 
             }
@@ -45,22 +50,29 @@ namespace VotingApp.API.Services
 
             if (voter == null)
             {
+                _logger.LogError($"Voter ID {voteRequest.VoterId} not found.");
+
                 throw new NotFoundException("Voter Id is not valid"); 
             }
 
             if (candidate == null)
             {
+                _logger.LogError($"Candidate ID {voteRequest.CandidateId} not found.");
+
                 throw new NotFoundException("Candidate not found.");
             }
 
             if (voter.StateId != candidate.StateId)
             {
+                _logger.LogWarning($"Voter ID {voteRequest.VoterId} attempted to vote for a candidate from a different state.");
+
                 throw new ConflictException ("Voter's state does not match candidate's state." );
             }
 
             Vote vote = new Vote { VoterId = voteRequest.VoterId, CandidateId = voteRequest.CandidateId ,DateTimeNow=currentLocal};
             await _context.Votes.AddAsync(vote);
             await _context.SaveChangesAsync();
+            _logger.LogInfo($"Vote successfully cast by Voter ID: {voteRequest.VoterId} for Candidate ID: {voteRequest.CandidateId}");
 
             return true;
         }
