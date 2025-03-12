@@ -27,7 +27,7 @@ if(stateResults == null)
 
 
           
-            var response = new ApiResponseDTO<IEnumerable<stateResultModel>>(
+            var response = new ApiResponseDTO<IEnumerable<StateResultModel>>(
                 false, 200, "OK", stateResults
             );
 

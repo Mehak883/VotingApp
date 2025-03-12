@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace VotingApp.API.DTOs
 {
-    public class stateResultModel
+    public class StateResultModel
     {
         public Guid StateId { get; set; }
         public string StateName { get; set; }
@@ -16,6 +16,10 @@ namespace VotingApp.API.DTOs
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int? VoteCount { get; set; }
 
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Guid? PartyId { get; set; }
+
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? PartyName { get; set; }
 
@@ -26,7 +30,7 @@ namespace VotingApp.API.DTOs
         public string? TieMessage { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public List<stateResultModel>? TiedCandidates { get; set; }
+        public List<StateResultModel>? TiedCandidates { get; set; }
     }
 
 

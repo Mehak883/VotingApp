@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using VotingApp.API.Services.Interfaces;
 using VotingApp.API.DTOs;
-using VotingApp.API.Services;
 
 namespace VotingApp.API.Controllers
 {

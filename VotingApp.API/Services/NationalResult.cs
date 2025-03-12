@@ -41,7 +41,7 @@ namespace VotingApp.API.Services
 
 
            
-            var partyWinCounts = new Dictionary<string, (string PartySymbol, int StateWinCount)>();
+            var partyWinCounts = new Dictionary<string, (string PartySymbol, int StateWinCount, Guid PartyId)>();
 
             foreach (var state in stateResults)
             {
@@ -52,11 +52,11 @@ namespace VotingApp.API.Services
                     {
                         if (partyWinCounts.ContainsKey(candidate.PartyName))
                         {
-                            partyWinCounts[candidate.PartyName] = (candidate.PartySymbol, partyWinCounts[candidate.PartyName].StateWinCount + 1);
+                            partyWinCounts[candidate.PartyName] = (candidate.PartySymbol, partyWinCounts[candidate.PartyName].StateWinCount + 1, candidate.PartyId.GetValueOrDefault(Guid.Empty));
                         }
                         else
                         {
-                            partyWinCounts[candidate.PartyName] = (candidate.PartySymbol, 1);
+                            partyWinCounts[candidate.PartyName] = (candidate.PartySymbol, 1, candidate.PartyId.GetValueOrDefault(Guid.Empty));
                         }
                     }
                 }
@@ -64,11 +64,11 @@ namespace VotingApp.API.Services
                 {
                     if (partyWinCounts.ContainsKey(state.PartyName))
                     {
-                        partyWinCounts[state.PartyName] = (state.PartySymbol, partyWinCounts[state.PartyName].StateWinCount + 1);
+                        partyWinCounts[state.PartyName] = (state.PartySymbol, partyWinCounts[state.PartyName].StateWinCount + 1,  state.PartyId.GetValueOrDefault(Guid.Empty));
                     }
                     else
                     {
-                        partyWinCounts[state.PartyName] = (state.PartySymbol, 1);
+                        partyWinCounts[state.PartyName] = (state.PartySymbol, 1,state.PartyId.GetValueOrDefault(Guid.Empty));
                     }
                 }
             }
@@ -79,7 +79,7 @@ namespace VotingApp.API.Services
         {
             new NationalResultModel { PartyName = "No Clear Winner", PartySymbol = "-", StateWinCount = 0 }
         };
-            }
+            } 
 
             int maxWins = partyWinCounts.Max(p => p.Value.StateWinCount);
             var topParties = partyWinCounts.Where(p => p.Value.StateWinCount == maxWins).ToList();
@@ -90,6 +90,7 @@ namespace VotingApp.API.Services
         {
             new NationalResultModel
             {
+               PartyId = topParties.First().Value.PartyId,
                 PartyName = topParties.First().Key,
                 PartySymbol = topParties.First().Value.PartySymbol,
                 StateWinCount = topParties.First().Value.StateWinCount
@@ -101,6 +102,7 @@ namespace VotingApp.API.Services
 
                 return topParties.Select(p => new NationalResultModel
                 {
+                    PartyId = p.Value.PartyId,
                     PartyName = p.Key,
                     PartySymbol = p.Value.PartySymbol,
                     StateWinCount = p.Value.StateWinCount
