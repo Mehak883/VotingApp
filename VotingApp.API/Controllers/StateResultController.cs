@@ -1,12 +1,6 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VotingApp.API.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using VotingApp.API.DTOs;
-using VotingApp.API.Services;
 
 
 namespace VotingApp.API.Controllers
@@ -24,6 +18,13 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> GetAllStateResults()
         {
             var stateResults = await stateResultService.GetStateResultsAsync();
+
+if(stateResults == null)
+            {
+                var stringResponse = new ApiResponseDTO<String>(false, 200, "OK", (String)"Result is not declared yet");
+                return Ok(stringResponse);
+            }
+
 
             if (stateResults == null || !stateResults.Any())
             {

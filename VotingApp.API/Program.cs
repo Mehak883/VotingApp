@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json;
 using VotingApp.API.Data;
 using VotingApp.API.Middlewares;
 using VotingApp.API.Models;
@@ -89,6 +90,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
@@ -99,7 +101,28 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"]
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = context =>
+        {
+            // Suppress default WWW-Authenticate header
+            context.HandleResponse(); 
+            var errorResponse = new
+            {
+                error = true,
+                code = 401,
+                errorMessage = "User not authorized"
+            };
+            // Return a custom JSON response
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json";
+            return context.Response.WriteAsync(JsonSerializer.Serialize(errorResponse));
+        }
+    };
 });
+
+
+
 builder.Services.AddAuthorization();
 
 
