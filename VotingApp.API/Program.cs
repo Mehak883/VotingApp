@@ -20,6 +20,8 @@ builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddSingleton<ILoggerService, LoggerService>();
 builder.Services.AddScoped<IPartyService, PartyService>();
 builder.Services.AddScoped<IStateResults, StateResults>();
+builder.Services.AddScoped<INationalResult, NationalResult>();
+
 
 builder.Services.AddScoped<IVoterService, VoterService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
