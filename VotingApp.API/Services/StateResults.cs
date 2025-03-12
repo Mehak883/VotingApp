@@ -2,32 +2,104 @@ using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs;
 using VotingApp.API.Services.Interfaces;
-
 namespace VotingApp.API.Services
 {
     public class StateResults : IStateResults
     {
         private readonly VotingAppDbContext _context;
-
         public StateResults(VotingAppDbContext context)
         {
             _context = context;
         }
-
         public async Task<IEnumerable<stateResultModel>> GetStateResultsAsync()
         {
-            var result = await _context.Votes
-                 .GroupBy(v => new { StateName =v.Voter.State.Name,  CandidateName = v.Candidate.FullName })
-                 .Select(g => new stateResultModel
-                 {
-                     StateName = g.Key.StateName,
-                     CandidateName = g.Key.CandidateName,
-                     VoteCount = g.Select(v => v.VoterId).Distinct().Count()
-                 }).OrderByDescending(g => g.VoteCount).ToListAsync();
-            return result;
+            //var voteResults = await _context.Votes
+            //.Include(v => v.Candidate.Party)
+            //.Include(v => v.Voter.State)
+            //.Select(v => new stateResultModel
+            //{
+            //    StateId = v.Voter.State.Id,
+            //    StateName = v.Voter.State.Name,
+            //    CandidateId = v.Candidate.Id,
+            //    CandidateName = v.Candidate.FullName,
+            //    PartyName = v.Candidate.Party.Name,
+            //    PartySymbol = v.Candidate.Party.Symbol,
+            //    VoteCount = _context.Votes
+            //        .Where(vote => vote.CandidateId == v.Candidate.Id && vote.Voter.State.Id == v.Voter.State.Id)
+            //        .Select(vote => vote.VoterId)
+            //        .Distinct()
+            //        .Count()
+            //})
+            //.OrderByDescending(r => r.VoteCount)
+            //.ToListAsync();
+            // Use DistinctBy (requires System.Linq)
+            //var result = voteResults
+            //    .DistinctBy(r => r.StateId) // Keep only the top candidate per state
+            //    .ToList();
+            //return result;
+
+
+            var votes = await _context.Votes
+            .Include(v => v.Candidate.Party)
+            .Include(v => v.Voter.State)
+            .Select(v => new
+            {
+                StateId = v.Voter.State.Id,
+                StateName = v.Voter.State.Name,
+                CandidateId = v.Candidate.Id,
+                CandidateName = v.Candidate.FullName,
+                PartyName = v.Candidate.Party.Name,
+                PartySymbol = v.Candidate.Party.Symbol,
+                VoterId = v.VoterId 
+            })
+            .ToListAsync();
+
+           
+            var voteResults = votes
+                .GroupBy(v => new { v.StateId, v.StateName, v.CandidateId, v.CandidateName, v.PartyName, v.PartySymbol })
+                .Select(g => new stateResultModel
+                {
+                    StateId = g.Key.StateId,
+                    StateName = g.Key.StateName,
+                    CandidateId = g.Key.CandidateId,
+                    CandidateName = g.Key.CandidateName,
+                    PartyName = g.Key.PartyName,
+                    PartySymbol = g.Key.PartySymbol,
+                    VoteCount = g.Select(v => v.VoterId).Distinct().Count() 
+                })
+                .ToList();
+
+           
+            var groupedResults = voteResults
+                .GroupBy(r => new { r.StateId, r.StateName})
+                .Select(stateGroup =>
+                {
+                    var maxVotes = stateGroup.Max(r => r.VoteCount);
+                    var topCandidates = stateGroup.Where(r => r.VoteCount == maxVotes).ToList();
+
+                    if (topCandidates.Count > 1) 
+                    {
+                        return new stateResultModel
+                        {
+                            StateId = stateGroup.Key.StateId,
+                            StateName = stateGroup.Key.StateName,
+                            TieMessage = $"Tie between {string.Join(" and ", topCandidates.Select(c => c.PartyName))}",
+                            TiedCandidates = topCandidates
+                        };
+                    }
+                    else 
+                    {
+                        return topCandidates.First();
+                    }
+                })
+                .OrderByDescending(r => r.VoteCount) 
+                .ToList();
+
+            return groupedResults;
         }
-                 
-        
+
+
+
+
     }
 }
-
