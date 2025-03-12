@@ -1,43 +1,34 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs;
+using VotingApp.API.Exceptions;
 using VotingApp.API.Services.Interfaces;
 namespace VotingApp.API.Services
 {
     public class StateResults : IStateResults
     {
         private readonly VotingAppDbContext _context;
-        public StateResults(VotingAppDbContext context)
+        private readonly IVoteSessionService _voteSessionService;
+        public StateResults(VotingAppDbContext context,IVoteSessionService voteSessionService)
         {
+            _voteSessionService = voteSessionService;
             _context = context;
         }
         public async Task<IEnumerable<stateResultModel>> GetStateResultsAsync()
         {
-            //var voteResults = await _context.Votes
-            //.Include(v => v.Candidate.Party)
-            //.Include(v => v.Voter.State)
-            //.Select(v => new stateResultModel
-            //{
-            //    StateId = v.Voter.State.Id,
-            //    StateName = v.Voter.State.Name,
-            //    CandidateId = v.Candidate.Id,
-            //    CandidateName = v.Candidate.FullName,
-            //    PartyName = v.Candidate.Party.Name,
-            //    PartySymbol = v.Candidate.Party.Symbol,
-            //    VoteCount = _context.Votes
-            //        .Where(vote => vote.CandidateId == v.Candidate.Id && vote.Voter.State.Id == v.Voter.State.Id)
-            //        .Select(vote => vote.VoterId)
-            //        .Distinct()
-            //        .Count()
-            //})
-            //.OrderByDescending(r => r.VoteCount)
-            //.ToListAsync();
-            // Use DistinctBy (requires System.Linq)
-            //var result = voteResults
-            //    .DistinctBy(r => r.StateId) // Keep only the top candidate per state
-            //    .ToList();
-            //return result;
+            VotingTimingDTO votingTiming= _voteSessionService.LoadVotingTimings();
 
+            DateTime currentLocal = DateTime.Now;
+            if (!DateTime.TryParse(votingTiming.StartTime, out DateTime startTime))
+                throw new BadRequestException("Invalid start time format.");
+            if (!DateTime.TryParse(votingTiming.EndTime, out DateTime endTime))
+                throw new BadRequestException("Invalid end time format.");
+
+            if (currentLocal < endTime)
+            {
+                return null;
+              }
 
             var votes = await _context.Votes
             .Include(v => v.Candidate.Party)
@@ -97,9 +88,5 @@ namespace VotingApp.API.Services
 
             return groupedResults;
         }
-
-
-
-
     }
 }

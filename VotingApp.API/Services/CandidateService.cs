@@ -97,7 +97,55 @@ namespace VotingApp.API.Services
                 })
                 .ToListAsync();
         }
+        public async Task<List<CandidateResponse>> GetCandidateDataByStateId(Guid StateId)
+        {
+            var state = await dbContext.States.FindAsync(StateId);
+            if (state == null)
+            {
+                throw new NotFoundException("No such state exists.");
+            }
+            
+            return await dbContext.Candidates
+                .Where(c => c.StateId == StateId)
+                .Include(c => c.State)
+                .Include(c => c.Party)
+                .Select(c => new CandidateResponse
+                {
+                    Id = c.Id,
+                    FullName = c.FullName,
+                    StateId = c.StateId,
+                    StateName = c.State.Name,
+                    PartyId = c.PartyId,
+                    PartyName = c.Party.Name,
+                    Symbol = c.Party.Symbol
+                })
+                .ToListAsync();
+        }
 
+        public async Task<List<CandidateResponse>> GetCandidateDataByPartyId(Guid PartyId)
+        {
+            var party = await dbContext.Parties.FindAsync(PartyId);
+            if (party == null)
+            {
+                throw new NotFoundException("No such party exists.");
+            }
+
+            return await dbContext.Candidates
+                .Where(c => c.PartyId == PartyId)
+                .Include(c => c.State)
+                .Include(c => c.Party)
+                .Select(c => new CandidateResponse
+                {
+                    Id = c.Id,
+                    FullName = c.FullName,
+                    StateId = c.StateId,
+                    StateName = c.State.Name,
+                    PartyId = c.PartyId,
+                    PartyName = c.Party.Name,
+                    Symbol = c.Party.Symbol
+                })
+                .ToListAsync();
+        }
         public async Task<CandidateResponse?> GetCandidateData(Guid Id)
         {
          var candidate = await dbContext.Candidates.Include(c => c.Party)  
