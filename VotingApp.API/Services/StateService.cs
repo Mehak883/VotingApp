@@ -1,4 +1,5 @@
 ﻿ using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.State;
 using VotingApp.API.Exceptions;
@@ -10,10 +11,11 @@ namespace VotingApp.API.Services
     public class StateService : IStateService
     {
         private readonly VotingAppDbContext _context;
-
-        public StateService(VotingAppDbContext context)
+        private readonly ILoggerService _logger;
+        public StateService(VotingAppDbContext context, ILoggerService logger)
         {
             _context = context;
+            _logger = logger;
         }
         public async Task<List<StateResponse>> GetAllStatesAsync()
         {
@@ -28,7 +30,8 @@ namespace VotingApp.API.Services
             State ?state = await _context.States.FindAsync(Id);
             if (state == null)
             {
-               throw new NotFoundException("State not found");
+                _logger.LogWarning("State not found");
+                throw new NotFoundException("State not found");
             }
             return new StateResponse { Id = state.Id, Name = state.Name };
         }
@@ -38,6 +41,7 @@ namespace VotingApp.API.Services
 
             if (stateExists)
             {
+                _logger.LogWarning("State already exists");
                 throw new ConflictException("State already exists");
 
 
@@ -54,16 +58,16 @@ namespace VotingApp.API.Services
 
             if (stateExists)
             {
+                _logger.LogWarning("State already exists");
                 throw new ConflictException("State already exists");
-
 
             }
 
             var state = await _context.States.FindAsync(Id);
             
             if (state == null) {
+                _logger.LogWarning("State not found");
                throw new NotFoundException("State not found");
-
             }
 
             state.Name = stateRequest.Name;

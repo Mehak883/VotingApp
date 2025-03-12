@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.Party;
+using VotingApp.API.DTOs.Vote;
 using VotingApp.API.Exceptions;
 using VotingApp.API.Services.Interfaces;
 
@@ -10,9 +12,11 @@ namespace VotingApp.API.Services
     {
 
         private readonly VotingAppDbContext dbContext;
-        public PartyService(VotingAppDbContext dbContext)
+        private readonly ILoggerService _logger;
+        public PartyService(VotingAppDbContext dbContext, ILoggerService logger)
         {
             this.dbContext = dbContext;
+            _logger = logger;
         }
 
         public async Task<PartyResponse?> AddPartyData(PartyRequest partyRequest)
@@ -20,10 +24,12 @@ namespace VotingApp.API.Services
 
             if (await GetPartyExists(partyRequest))
             {
+                _logger.LogWarning($"{partyRequest.Name} already exists.");
                 throw new ConflictException("Party already exist");
             }
             if (await GetSymbolExists(partyRequest))
             {
+                _logger.LogWarning("Symbol already taken by another party");
                 throw new ConflictException("Symbol already taken by another party");
             }
             var party = new Models.Party
@@ -56,7 +62,10 @@ namespace VotingApp.API.Services
         {
            
             var party = await dbContext.Parties.FindAsync(Id);
-            if (party == null) throw new NotFoundException("Party not found");
+            if (party == null) {
+                _logger.LogWarning("Party not found");
+            throw new NotFoundException("Party not found");
+            }
 
             return new PartyResponse
             {
@@ -87,14 +96,17 @@ namespace VotingApp.API.Services
 
             if (await GetPartyExistsUpdate(partyRequest,Id))
             {
+                _logger.LogWarning("Party already exist");
                 throw new ConflictException("Party already exist");
             }
             if (await GetSymbolExistsUpdate(partyRequest, Id)){
+                _logger.LogWarning("Symbol already taken");
                 throw new ConflictException("Symbol already taken");
             }
             var party = await dbContext.Parties.FindAsync(Id);
             if (party == null) 
                 {
+                _logger.LogWarning("Party not found");
                     throw new NotFoundException("Party not found");
                 }
             

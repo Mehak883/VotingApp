@@ -45,10 +45,7 @@ namespace VotingApp.API.Services
                 VoterId = v.VoterId 
             })
             .ToListAsync();
-
-
-
-           
+   
             var voteResults = votes
                 .GroupBy(v => new { v.StateId, v.StateName, v.CandidateId, v.CandidateName, v.PartyName, v.PartySymbol })
                 .Select(g => new stateResultModel
