@@ -17,6 +17,7 @@ namespace VotingApp.API.Services
         }
         public async Task<IEnumerable<stateResultModel>> GetStateResultsAsync()
         {
+
             VotingTimingDTO votingTiming= _voteSessionService.LoadVotingTimings();
 
             DateTime currentLocal = DateTime.Now;
@@ -45,6 +46,8 @@ namespace VotingApp.API.Services
             })
             .ToListAsync();
 
+
+
            
             var voteResults = votes
                 .GroupBy(v => new { v.StateId, v.StateName, v.CandidateId, v.CandidateName, v.PartyName, v.PartySymbol })
@@ -60,7 +63,8 @@ namespace VotingApp.API.Services
                 })
                 .ToList();
 
-           
+
+
             var groupedResults = voteResults
                 .GroupBy(r => new { r.StateId, r.StateName})
                 .Select(stateGroup =>

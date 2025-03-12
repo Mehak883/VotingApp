@@ -18,11 +18,27 @@ namespace VotingApp.API.Controllers
         public async Task<IActionResult> GetAllStateResults()
         {
             var stateResults = await stateResultService.GetStateResultsAsync();
+
 if(stateResults == null)
             {
                 var stringResponse = new ApiResponseDTO<String>(false, 200, "OK", (String)"Result is not declared yet");
                 return Ok(stringResponse);
             }
+
+
+            if (stateResults == null || !stateResults.Any())
+            {
+                var emptyResponse = new
+                {
+                    error = false,
+                    code = 200,
+                    responseCode = "OK",
+                    message="No results available",
+                };
+
+                return Ok(emptyResponse);
+            }
+
             var response = new ApiResponseDTO<IEnumerable<stateResultModel>>(
                 false, 200, "OK", stateResults
             );

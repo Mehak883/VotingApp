@@ -8,7 +8,5 @@ namespace VotingApp.API.Services.Interfaces
     public interface IStateResults
     {
         Task<IEnumerable<stateResultModel>> GetStateResultsAsync();
-
-
     }
 }
