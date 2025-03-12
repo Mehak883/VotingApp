@@ -16,9 +16,7 @@ namespace VotingApp.API.Services
         {
             _voteSessionService = voteSessionService;            
             _context = context;
-            //_sessionStart = DateTime.SpecifyKind(DateTime.Parse(configuration["VotingSession:Start"]), DateTimeKind.Local);
-            //_sessionEnd = DateTime.SpecifyKind(DateTime.Parse(configuration["VotingSession:End"]), DateTimeKind.Local);
-            //this.voteSessionService = voteSessionService;
+           
         }
         public async Task<bool> CastVoteAsync(VoteRequest voteRequest)
         {
