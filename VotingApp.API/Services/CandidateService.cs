@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.Candidate;
+using VotingApp.API.DTOs.Party;
+using VotingApp.API.DTOs.State;
 using VotingApp.API.Exceptions;
 using VotingApp.API.Models;
 using VotingApp.API.Services.Interfaces;
@@ -22,6 +25,11 @@ namespace VotingApp.API.Services
         public async Task<CandidateResponse?> AddCandidateData(CandidateRequest candidateRequest)
         {
             _logger.LogInfo("Adding new candidate.");
+            if (!Regex.IsMatch(candidateRequest.FullName, @"^[a-zA-Z\s]+$"))
+            {
+                _logger.LogWarning("Invalid candidate name. Only alphabetic characters are allowed.");
+                throw new BadRequestException("candidate name should contain only alphabetic characters.");
+            }
             var stateExists = await dbContext.States.AnyAsync(s => s.Id == candidateRequest.StateId);
             var partyExists = await dbContext.Parties.AnyAsync(p => p.Id == candidateRequest.PartyId);
 
@@ -136,30 +144,30 @@ namespace VotingApp.API.Services
                 .ToListAsync();
         }
 
-        public async Task<List<CandidateResponse>> GetCandidateDataByPartyId(Guid PartyId)
-        {
-            var party = await dbContext.Parties.FindAsync(PartyId);
-            if (party == null)
-            {_logger.LogWarning("No such party exists.");
-                throw new NotFoundException("No such party exists.");
-            }
+        //public async Task<List<CandidateResponse>> GetCandidateDataByPartyId(Guid PartyId)
+        //{
+        //    var party = await dbContext.Parties.FindAsync(PartyId);
+        //    if (party == null)
+        //    {_logger.LogWarning("No such party exists.");
+        //        throw new NotFoundException("No such party exists.");
+        //    }
 
-            return await dbContext.Candidates
-                .Where(c => c.PartyId == PartyId)
-                .Include(c => c.State)
-                .Include(c => c.Party)
-                .Select(c => new CandidateResponse
-                {
-                    Id = c.Id,
-                    FullName = c.FullName,
-                    StateId = c.StateId,
-                    StateName = c.State.Name,
-                    PartyId = c.PartyId,
-                    PartyName = c.Party.Name,
-                    Symbol = c.Party.Symbol
-                })
-                .ToListAsync();
-        }
+        //    return await dbContext.Candidates
+        //        .Where(c => c.PartyId == PartyId)
+        //        .Include(c => c.State)
+        //        .Include(c => c.Party)
+        //        .Select(c => new CandidateResponse
+        //        {
+        //            Id = c.Id,
+        //            FullName = c.FullName,
+        //            StateId = c.StateId,
+        //            StateName = c.State.Name,
+        //            PartyId = c.PartyId,
+        //            PartyName = c.Party.Name,
+        //            Symbol = c.Party.Symbol
+        //        })
+        //        .ToListAsync();
+        //}
         public async Task<CandidateResponse?> GetCandidateData(Guid Id)
         {
             _logger.LogInfo($"Updating candidate with ID: {Id}");
@@ -184,7 +192,16 @@ namespace VotingApp.API.Services
 
         public async Task<bool?> UpdateCandidateData(Guid id, CandidateRequest candidateRequest)
         {
+            if (!Regex.IsMatch(candidateRequest.FullName, @"^[a-zA-Z\s]+$"))
+            {
+                _logger.LogWarning("Invalid candidate name. Only alphabetic characters are allowed.");
+                throw new BadRequestException("Candidate name should contain only alphabetic characters.");
+            }
+
             var candidate = await dbContext.Candidates.FirstOrDefaultAsync(c => c.Id == id);
+
+          
+
 
             if (candidate == null)
             {_logger.LogWarning("Candidate not found.");

@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 using VotingApp.API.Data;
 using VotingApp.API.DTOs.Party;
+using VotingApp.API.DTOs.State;
 using VotingApp.API.Exceptions;
 using VotingApp.API.Services.Interfaces;
 
@@ -20,6 +22,11 @@ namespace VotingApp.API.Services
         public async Task<PartyResponse?> AddPartyData(PartyRequest partyRequest)
         {
 
+            if (!Regex.IsMatch(partyRequest.Name, @"^[a-zA-Z\s]+$"))
+            {
+                _logger.LogWarning("Invalid party name. Only alphabetic characters are allowed.");
+                throw new BadRequestException("Party name should contain only alphabetic characters.");
+            }
             if (await GetPartyExists(partyRequest))
             {
                 _logger.LogWarning($"{partyRequest.Name} already exists.");
@@ -90,7 +97,11 @@ namespace VotingApp.API.Services
             return await dbContext.Parties.AnyAsync(p => p.Symbol.ToUpper() == partyRequest.Symbol.ToUpper() && p.Id != Id);
         }
         public async Task<bool?> UpdatePartyAsync(Guid Id, PartyRequest partyRequest) {
-
+            if (!Regex.IsMatch(partyRequest.Name, @"^[a-zA-Z\s]+$"))
+            {
+                _logger.LogWarning("Invalid party name. Only alphabetic characters are allowed.");
+                throw new BadRequestException("Party name should contain only alphabetic characters.");
+            }
 
             if (await GetPartyExistsUpdate(partyRequest,Id))
             {

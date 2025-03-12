@@ -56,14 +56,14 @@ namespace VotingApp.API.Controllers
             return Ok(response);
         }
 
-        [HttpGet("by-party/{PartyId}")]
+        //[HttpGet("by-party/{PartyId}")]
 
-        public async Task<IActionResult> GetCandidateByPartyId(Guid PartyId)
-        {
-            var candidates = await candidateService.GetCandidateDataByPartyId(PartyId);
-            var response = new ApiResponseDTO<List<CandidateResponse>>(false, 200, "OK", candidates);
-            return Ok(response);
-        }
+        //public async Task<IActionResult> GetCandidateByPartyId(Guid PartyId)
+        //{
+        //    var candidates = await candidateService.GetCandidateDataByPartyId(PartyId);
+        //    var response = new ApiResponseDTO<List<CandidateResponse>>(false, 200, "OK", candidates);
+        //    return Ok(response);
+        //}
 
         [Authorize]
         [HttpDelete("{id}")]
