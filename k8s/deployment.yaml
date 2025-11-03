@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: votingapp
-          image: ocker.io/mehak0504/votingapp:12
+          image: docker.io/mehak0504/votingapp:12
           ports:
             - containerPort: 80
           readinessProbe:
