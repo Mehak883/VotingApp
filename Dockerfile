@@ -2,13 +2,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# copy project files
-COPY VotingApp/VotingApp.csproj VotingApp/
-RUN dotnet restore VotingApp/VotingApp.csproj
+# Copy solution and project files
+COPY VotingApp.sln ./
+COPY VotingApp.API/VotingApp.API.csproj VotingApp.API/
+RUN dotnet restore VotingApp.API/VotingApp.API.csproj
 
-# copy the rest of the source
+# Copy all source and build
 COPY . .
-WORKDIR /src/VotingApp
+WORKDIR /src/VotingApp.API
 RUN dotnet publish -c Release -o /app/publish
 
 # Stage 2: Runtime
@@ -17,4 +18,4 @@ WORKDIR /app
 COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:80
 EXPOSE 80
-ENTRYPOINT ["dotnet", "VotingApp.dll"]
+ENTRYPOINT ["dotnet", "VotingApp.API.dll"]
