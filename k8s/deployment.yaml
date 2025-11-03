@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: votingapp
-          image: docker.io/mehak0504/votingapp:${IMAGE_TAG}
+          image: <+artifact.image>
           ports:
             - containerPort: 80
           readinessProbe:
